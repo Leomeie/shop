@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.venv/
+venv/
+env/
+*.so
+
+# Django
+shop_api/media/
+shop_api/staticfiles/
+shop_api/logs/*.log
+shop_api/db.sqlite3
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+frontend/dist/
+frontend/dist-ssr/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# OS
+*.log
+npm-debug.log*

@@ -1,0 +1,21 @@
+# Django
+Django>=4.2,<5.0
+djangorestframework>=3.14
+django-cors-headers>=4.3
+django-filter>=24.1
+
+# JWT
+djangorestframework-simplejwt>=5.3
+
+# MySQL
+mysqlclient>=2.2
+
+# Redis
+django-redis>=5.4
+redis>=5.0
+
+# Image processing
+Pillow>=10.2
+
+# Utilities
+python-dotenv>=1.0

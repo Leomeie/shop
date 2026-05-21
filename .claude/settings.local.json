@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(py *)",
+      "WebSearch",
+      "Bash(npm search *)",
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Read(//c/Users/Luo/.agents/skills/ui-ux-pro-max/**)",
+      "Bash(python scripts/search.py \"AI digital store elegant dynamic modern\" --design-system -p \"ShopEase\")",
+      "Bash(dir *)",
+      "Bash(rtk ls *)",
+      "Bash(rtk npm *)",
+      "Bash(where agent-browser *)",
+      "Bash(npm list *)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "mcp_server_mysql"
+  ]
+}
