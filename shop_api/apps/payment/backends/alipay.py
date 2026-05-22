@@ -7,25 +7,42 @@ logger = logging.getLogger(__name__)
 
 
 def _format_pem_key(raw_key: str, key_type: str) -> str:
-    """Ensure a PEM key has proper headers, footers, and line breaks."""
+    """Ensure a PEM key has proper headers, footers, and line breaks.
+    Automatically converts PKCS#8 private keys to PKCS#1 for Alipay SDK compatibility.
+    """
     raw = raw_key.strip()
+
+    # Already has PEM headers
     if raw.startswith("-----"):
-        return raw  # Already formatted
-
-    # Remove any existing newlines/spaces in the base64 content
-    b64 = "".join(raw.split())
-
-    # Wrap at 64 chars per line (PEM standard)
-    lines = [b64[i:i+64] for i in range(0, len(b64), 64)]
-
-    if key_type == "private":
-        header = "-----BEGIN RSA PRIVATE KEY-----"
-        footer = "-----END RSA PRIVATE KEY-----"
+        pem = raw
     else:
-        header = "-----BEGIN PUBLIC KEY-----"
-        footer = "-----END PUBLIC KEY-----"
+        # Raw base64 — wrap with headers
+        b64 = "".join(raw.split())
+        lines = [b64[i:i+64] for i in range(0, len(b64), 64)]
+        if key_type == "private":
+            pem = "\n".join(["-----BEGIN PRIVATE KEY-----"] + lines + ["-----END PRIVATE KEY-----"])
+        else:
+            pem = "\n".join(["-----BEGIN PUBLIC KEY-----"] + lines + ["-----END PUBLIC KEY-----"])
 
-    return "\n".join([header] + lines + [footer])
+    # Convert PKCS#8 → PKCS#1 for private keys (Alipay SDK requires PKCS#1)
+    if key_type == "private" and "BEGIN PRIVATE KEY" in pem:
+        try:
+            from cryptography.hazmat.primitives import serialization
+            from cryptography.hazmat.backends import default_backend
+
+            private_key = serialization.load_pem_private_key(
+                pem.encode(), password=None, backend=default_backend()
+            )
+            pem = private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption(),
+            ).decode()
+            logger.info("Converted PKCS#8 private key to PKCS#1")
+        except Exception:
+            logger.exception("Failed to convert PKCS#8 to PKCS#1")
+
+    return pem
 
 
 class AlipayPaymentBackend(PaymentBackend):
