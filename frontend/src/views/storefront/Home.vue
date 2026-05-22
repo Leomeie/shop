@@ -302,12 +302,33 @@ onUnmounted(() => {
 .btn-gradient {
   background: var(--gradient-blue);
   color: var(--white);
+  position: relative;
+  overflow: hidden;
   box-shadow: 0 8px 24px rgba(59, 130, 246, 0.28);
+}
+
+.btn-gradient > * {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 0;
 }
 
 .btn-gradient:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 32px rgba(59, 130, 246, 0.38);
+}
+
+.btn-gradient:hover::before {
+  opacity: 1;
 }
 
 .btn-glass {
