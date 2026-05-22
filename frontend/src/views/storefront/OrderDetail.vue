@@ -92,7 +92,7 @@
 
               <div class="summary-rail__actions">
                 <template v-if="order.status === 'pending'">
-                  <button class="action-primary" type="button" @click="showPayModal = true">立即支付</button>
+                  <button class="action-primary" type="button" @click="handlePayConfirm">立即支付</button>
                   <button class="action-ghost" type="button" @click="handleCancel">取消订单</button>
                 </template>
 
@@ -122,7 +122,6 @@ import { createPayment } from '../../api/payment'
 const route = useRoute()
 const order = ref(null)
 const loading = ref(false)
-const showPayModal = ref(false)
 
 const statusIcon = computed(() => {
   const map = { pending: 'calendar', completed: 'check', cancelled: 'close', paid: 'send' }
@@ -146,7 +145,6 @@ onMounted(async () => {
 async function handlePayConfirm() {
   try {
     const payRes = await createPayment({ order_id: order.value.id, method: 'alipay' })
-    showPayModal.value = false
     const payUrl = payRes.data.pay_url
     if (payUrl) {
       window.location.href = payUrl
@@ -154,7 +152,6 @@ async function handlePayConfirm() {
       ElMessage.error('获取支付链接失败')
     }
   } catch (err) {
-    showPayModal.value = false
     ElMessage.error(err.message || '支付失败')
   }
 }
