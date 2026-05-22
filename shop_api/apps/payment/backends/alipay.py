@@ -16,8 +16,13 @@ def _format_pem_key(raw_key: str, key_type: str) -> str:
     if raw.startswith("-----"):
         pem = raw
     else:
-        # Raw base64 — wrap with headers
+        # Raw base64 — clean and fix padding
         b64 = "".join(raw.split())
+        # Fix base64 padding
+        missing_padding = len(b64) % 4
+        if missing_padding:
+            b64 += "=" * (4 - missing_padding)
+        # Wrap at 64 chars per line
         lines = [b64[i:i+64] for i in range(0, len(b64), 64)]
         if key_type == "private":
             pem = "\n".join(["-----BEGIN PRIVATE KEY-----"] + lines + ["-----END PRIVATE KEY-----"])
@@ -128,7 +133,7 @@ class AlipayPaymentBackend(PaymentBackend):
             from cryptography.hazmat.backends import default_backend
 
             # Format the public key
-            pub_key_str = _format_pem_key(settings.ALIPAY["ALIPAY_PUBLIC_KEY"], "public")
+            pub_key_str = _format_pem_key(settings.ALIPAY.get("ALIPAY_PUBLIC_KEY", ""), "public")
 
             public_key = serialization.load_pem_public_key(
                 pub_key_str.encode(), backend=default_backend()
