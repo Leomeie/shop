@@ -44,8 +44,8 @@
   --glass-bg-light:        rgba(30, 41, 59, 0.85);
   --glass-border:          rgba(59, 130, 246, 0.2);
   --glass-border-active:   rgba(59, 130, 246, 0.5);
-  --glass-shadow:          0 4px 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(59, 130, 246, 0.1);
-  --glass-shadow-hover:    0 8px 30px rgba(0, 0, 0, 0.4), 0 0 60px rgba(59, 130, 246, 0.2);
+  --glass-shadow:          0 4px 20px rgba(0, 0, 0, 0.3);
+  --glass-shadow-hover:    0 8px 30px rgba(0, 0, 0, 0.4);
 
   /* Gradients */
   --gradient-tech:    linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);

@@ -2,12 +2,6 @@
   <div class="home">
     <section class="screen-hero" id="home-hero">
       <div class="hero-bg">
-        <div class="hero-orb orb-1" />
-        <div class="hero-orb orb-2" />
-        <div class="hero-orb orb-3" />
-        <div class="hero-logo-glow">
-          <img src="/images/logo.png" alt="" />
-        </div>
         <div class="hero-grid" />
       </div>
 
@@ -18,7 +12,7 @@
         </div>
 
         <h1 class="hero-title">
-          <GradientText variant="blue">发现最好的</GradientText>
+          <span style="color: var(--accent)">发现最好的</span>
           <br />
           <span class="title-line">AI 工具与模板</span>
         </h1>
@@ -46,9 +40,8 @@
       <div class="container system-shell">
         <div class="system-head">
           <div class="system-copy">
-            <span class="section-kicker">Delivery System</span>
             <h2 class="section-title">
-              <GradientText variant="purple">为创作者设计的交付系统</GradientText>
+              <span style="color: var(--accent-purple)">为创作者设计的交付系统</span>
             </h2>
             <p class="section-desc">
               首页不再只是展示，而是一条完整的决策路径。
@@ -68,7 +61,7 @@
                 <div class="step-copy">
                   <h3>
                     <img :src="step.icon" alt="" class="step-title-icon" width="20" height="20" />
-                    <GradientText variant="blue">{{ step.title }}</GradientText>
+                    <span style="color: var(--accent)">{{ step.title }}</span>
                   </h3>
                   <p>{{ step.desc }}</p>
                 </div>
@@ -80,17 +73,17 @@
         <div class="system-metrics">
           <div class="metric-card glass-card">
             <div class="metric-icon"><img src="/icons/dingdan.svg" alt="" width="24" height="24" /></div>
-            <strong><GradientText variant="blue">即时下载</GradientText></strong>
+            <strong><span style="color: var(--accent)">即时下载</span></strong>
             <span>支付后立刻可用，不把时间耗在等待上。</span>
           </div>
           <div class="metric-card glass-card">
             <div class="metric-icon"><img src="/icons/pingtai.svg" alt="" width="24" height="24" /></div>
-            <strong><GradientText variant="purple">结构清晰</GradientText></strong>
+            <strong><span style="color: var(--accent-purple)">结构清晰</span></strong>
             <span>资源按工作流和用途组织，减少来回跳转。</span>
           </div>
           <div class="metric-card glass-card">
             <div class="metric-icon"><img src="/icons/guanli.svg" alt="" width="24" height="24" /></div>
-            <strong><GradientText variant="pink">持续维护</GradientText></strong>
+            <strong><span style="color: var(--accent-pink)">持续维护</span></strong>
             <span>版本迭代与资源更新可长期获取。</span>
           </div>
         </div>
@@ -99,17 +92,14 @@
 
     <section v-if="showcaseItems.length" class="screen screen-showcase" id="home-showcase">
       <div class="showcase-bg">
-        <div class="showcase-glow glow-left" />
-        <div class="showcase-glow glow-right" />
         <div class="showcase-grid" />
       </div>
 
       <div class="container showcase-shell">
         <div class="showcase-header">
           <div>
-            <span class="section-kicker section-kicker-on-dark">Curated Picks</span>
             <h2 class="section-title section-title-on-dark">
-              <GradientText variant="purple">直接进入高价值资源</GradientText>
+              <span style="color: var(--accent-purple)">直接进入高价值资源</span>
             </h2>
             <p class="section-desc section-desc-on-dark">
               我把第四屏设计成入口矩阵，而不是空白结束页。你可以直接从这里进入热门资源、模板方向和工作流分类。
@@ -135,7 +125,7 @@
             <div class="showcase-card-media" :style="item.cover ? { backgroundImage: `url(${item.cover})` } : undefined" />
             <div class="showcase-card-body">
               <span class="showcase-card-label">{{ item.label }}</span>
-              <h3><GradientText variant="blue">{{ item.title }}</GradientText></h3>
+              <h3><span style="color: var(--accent)">{{ item.title }}</span></h3>
               <p>{{ item.desc }}</p>
               <div class="showcase-card-meta">
                 <span>{{ item.meta }}</span>
@@ -153,7 +143,6 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { gsap, ScrollTrigger } from '../../composables/useGsap.js'
 import { getProducts } from '../../api/product'
-import GradientText from '../../components/GradientText.vue'
 
 const featured = ref([])
 let ctx = null
@@ -188,32 +177,10 @@ onMounted(async () => {
     // Hero entrance timeline
     const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } })
     heroTl
-      .fromTo('.hero-logo-glow', { opacity: 0, scale: 0.3 }, { opacity: 0.28, scale: 1, duration: 2, ease: 'power2.out' }, 0)
-      .fromTo('.hero-orb', { scale: 0, opacity: 0 }, { scale: 1, opacity: 0.45, duration: 1.2, stagger: 0.15 }, 0)
       .fromTo('.hero-badge', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, 0.2)
       .fromTo('.hero-title', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7 }, 0.35)
       .fromTo('.hero-desc', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, 0.55)
       .fromTo('.hero-actions', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, 0.7)
-
-    // Showcase background glow parallax
-    gsap.to('.glow-left', {
-      y: -60,
-      scrollTrigger: {
-        trigger: '.screen-showcase',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 1,
-      },
-    })
-    gsap.to('.glow-right', {
-      y: 40,
-      scrollTrigger: {
-        trigger: '.screen-showcase',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 1,
-      },
-    })
   })
 })
 
@@ -236,7 +203,7 @@ onUnmounted(() => {
   justify-content: center;
   min-height: 100dvh;
   overflow: hidden;
-  background: var(--ink);
+  background: #0f1629;
   color: var(--white);
 }
 
@@ -245,78 +212,6 @@ onUnmounted(() => {
   inset: 0;
 }
 
-.hero-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(24px);
-  opacity: 0;
-  transform: scale(0);
-  will-change: transform, opacity;
-}
-
-.orb-1 {
-  top: -120px;
-  right: -60px;
-  width: 320px;
-  height: 320px;
-  background: var(--accent-glow);
-  animation: floatSlow 20s ease-in-out infinite;
-}
-
-.orb-2 {
-  bottom: -80px;
-  left: -40px;
-  width: 240px;
-  height: 240px;
-  background: var(--purple-glow);
-  animation: floatSlow 24s ease-in-out infinite reverse;
-}
-
-.orb-3 {
-  top: 42%;
-  left: 45%;
-  width: 220px;
-  height: 220px;
-  background: var(--pink-glow);
-  animation: floatSlow 18s ease-in-out infinite;
-}
-
-.hero-logo-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.5);
-  width: 600px;
-  height: 600px;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 1;
-  mix-blend-mode: screen;
-  will-change: transform, opacity;
-}
-.hero-logo-glow img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: brightness(1.8) saturate(1.2);
-  mask-image: radial-gradient(circle at center, black 30%, transparent 72%);
-  -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 72%);
-  animation: logoPulse 4s ease-in-out infinite;
-}
-.hero-logo-glow::after {
-  content: '';
-  position: absolute;
-  inset: -30%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.15) 35%, rgba(59, 130, 246, 0.06) 60%, transparent 75%);
-  pointer-events: none;
-  animation: logoPulse 4s ease-in-out infinite;
-}
-
-@keyframes logoPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.04); opacity: 0.85; }
-}
 
 .hero-grid {
   position: absolute;
@@ -372,12 +267,7 @@ onUnmounted(() => {
 }
 
 .title-line {
-  background: linear-gradient(90deg, var(--white) 0%, var(--accent-light) 45%, var(--white) 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientShift 6s ease-in-out infinite;
+  color: var(--white);
 }
 
 .hero-desc {
@@ -455,7 +345,7 @@ onUnmounted(() => {
 
 .system-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: 2fr 3fr;
   gap: var(--sp-8);
   align-items: start;
 }
@@ -463,17 +353,6 @@ onUnmounted(() => {
 .system-copy {
   max-width: 560px;
   padding-top: var(--sp-4);
-}
-
-.section-kicker {
-  display: inline-flex;
-  margin-bottom: var(--sp-3);
-  color: var(--accent);
-  font-family: var(--font-display);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 .section-title {
@@ -525,8 +404,12 @@ onUnmounted(() => {
 
 .system-metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: var(--sp-4);
+}
+
+.system-metrics .metric-card:last-child {
+  grid-column: span 2;
 }
 
 .metric-card {
@@ -655,28 +538,6 @@ onUnmounted(() => {
   inset: 0;
 }
 
-.showcase-glow {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-}
-
-.glow-left {
-  left: -120px;
-  bottom: -80px;
-  width: 280px;
-  height: 280px;
-  background: rgba(74, 58, 255, 0.28);
-}
-
-.glow-right {
-  top: -60px;
-  right: -80px;
-  width: 300px;
-  height: 300px;
-  background: rgba(232, 89, 58, 0.26);
-}
-
 .showcase-shell {
   position: relative;
   z-index: 2;
@@ -690,10 +551,6 @@ onUnmounted(() => {
   gap: var(--sp-8);
   align-items: flex-end;
   margin-bottom: var(--sp-8);
-}
-
-.section-kicker-on-dark {
-  color: rgba(255, 122, 92, 0.9);
 }
 
 .section-title-on-dark {
@@ -729,7 +586,7 @@ onUnmounted(() => {
 }
 
 .showcase-card-media {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.3) 100%);
+  background: rgba(59, 130, 246, 0.08);
   background-position: center;
   background-size: cover;
 }
@@ -799,6 +656,10 @@ onUnmounted(() => {
     grid-template-columns: 1fr;
   }
 
+  .system-metrics .metric-card:last-child {
+    grid-column: span 1;
+  }
+
   .showcase-header {
     flex-direction: column;
     align-items: flex-start;
@@ -806,11 +667,6 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .hero-logo-glow {
-    width: 360px;
-    height: 360px;
-  }
-
   .hero-actions {
     flex-direction: column;
     align-items: stretch;
@@ -837,13 +693,7 @@ onUnmounted(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .orb-1,
-  .orb-2,
-  .orb-3,
-  .badge-dot,
-  .title-line,
-  .hero-logo-glow img,
-  .hero-logo-glow::after {
+  .badge-dot {
     animation: none !important;
   }
 
