@@ -3,6 +3,7 @@ from django.conf import settings
 
 
 class Order(models.Model):
+    """订单主体，记录金额、状态、优惠券及支付/完成时间。"""
     STATUS_CHOICES = [
         ("pending", "待支付"),
         ("paid", "已支付"),
@@ -35,6 +36,7 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    """订单子项，快照下单时的商品名称、SKU、单价，支持下载令牌。"""
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items", verbose_name="订单")
     sku = models.ForeignKey("products.SKU", on_delete=models.SET_NULL, null=True, verbose_name="SKU")
     product_name = models.CharField("商品名称", max_length=200)

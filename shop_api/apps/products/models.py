@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Category(models.Model):
-    """Product category (max 2 levels)."""
+    """商品分类，支持最多两级父子结构。"""
 
     name = models.CharField("分类名称", max_length=50)
     parent = models.ForeignKey(
@@ -25,7 +25,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    """Digital product."""
+    """数字商品主体，包含名称、描述、文件、状态等核心信息。"""
 
     STATUS_CHOICES = [
         ("draft", "草稿"),
@@ -70,7 +70,7 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    """Product preview images."""
+    """商品预览图，按排序展示。"""
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images", verbose_name="商品")
     image = models.ImageField("图片", upload_to="images/products/")
@@ -87,7 +87,7 @@ class ProductImage(models.Model):
 
 
 class SKU(models.Model):
-    """Stock Keeping Unit — version/license tier for digital products."""
+    """SKU 库存量单位，表示商品的版本/授权等级，含价格和授权说明。"""
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="skus", verbose_name="商品")
     name = models.CharField("版本名称", max_length=50)

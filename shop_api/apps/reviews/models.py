@@ -3,6 +3,7 @@ from django.conf import settings
 
 
 class Review(models.Model):
+    """商品评价，用户对已购商品打分（1-5）并可匿名。"""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reviews", verbose_name="用户")
     product = models.ForeignKey("products.Product", on_delete=models.CASCADE, related_name="reviews", verbose_name="商品")
     order = models.ForeignKey("orders.Order", on_delete=models.SET_NULL, null=True, blank=True, verbose_name="订单")

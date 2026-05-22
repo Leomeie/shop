@@ -2,7 +2,10 @@
   <router-link :to="`/products/${product.id}`" class="card" @mousemove="onMouseMove" @mouseleave="onMouseLeave" ref="cardRef">
     <div class="card-visual">
       <div class="card-img-wrap">
-        <img :src="product.main_image" :alt="product.name" loading="lazy" />
+        <img v-if="product.main_image" :src="product.main_image" :alt="product.name" loading="lazy" />
+        <div v-else class="card-img-placeholder">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </div>
       </div>
       <div v-if="product.is_featured" class="card-badge">精选</div>
       <div class="card-shine" />
@@ -111,6 +114,10 @@ onUnmounted(() => {
 .card-img-wrap img {
   width: 100%; height: 100%; object-fit: cover;
   transition: transform 0.6s var(--ease-out);
+}
+.card-img-placeholder {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); opacity: 0.4;
 }
 .card:hover .card-img-wrap img { transform: scale(1.06); }
 

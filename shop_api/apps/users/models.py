@@ -3,7 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
-    """Custom user model."""
+    """自定义用户模型，扩展手机号、昵称、头像等字段。"""
 
     phone = models.CharField("手机号", max_length=11, unique=True, null=True, blank=True)
     nickname = models.CharField("昵称", max_length=50, blank=True)
@@ -20,6 +20,7 @@ class User(AbstractUser):
 
 
 class DownloadLog(models.Model):
+    """用户下载记录，关联订单项，记录下载时间和来源 IP。"""
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="download_logs", verbose_name="用户")
     order_item = models.ForeignKey("orders.OrderItem", on_delete=models.CASCADE, verbose_name="订单项")

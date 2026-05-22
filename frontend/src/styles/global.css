@@ -1059,6 +1059,13 @@ input, textarea { font-family: inherit; }
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-gradient > * {
+  position: relative;
+  z-index: 1;
 }
 .btn-gradient::before {
   content: '';
@@ -1067,6 +1074,7 @@ input, textarea { font-family: inherit; }
   background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
   opacity: 0;
   transition: opacity 0.3s;
+  z-index: 0;
 }
 .btn-gradient:hover {
   transform: translateY(-2px);

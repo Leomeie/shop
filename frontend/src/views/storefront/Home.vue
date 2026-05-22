@@ -97,7 +97,7 @@
       </div>
     </section>
 
-    <section class="screen screen-showcase" id="home-showcase">
+    <section v-if="showcaseItems.length" class="screen screen-showcase" id="home-showcase">
       <div class="showcase-bg">
         <div class="showcase-glow glow-left" />
         <div class="showcase-glow glow-right" />
@@ -164,15 +164,7 @@ const workflowSteps = [
   { id: '03', title: '完成交付', desc: '从购买到下载形成闭环，减少跳转、减少等待、减少"买了却不会用"的断层。', icon: '/icons/cunchu.svg' },
 ]
 
-const fallbackShowcase = [
-  { id: 'prompt-bundle', label: 'Prompt Bundle', title: '高转化 Prompt 模板', desc: '适合营销文案、图像生成和角色设定的成套模板，开箱即用。', meta: '模板集合', to: '/products?search=prompt', cover: '' },
-  { id: 'comfyui-workflow', label: 'Workflow', title: 'ComfyUI 工作流', desc: '把常用节点链路整理成可重复使用的工作流，降低试错成本。', meta: '工作流方向', to: '/products?search=workflow', cover: '' },
-  { id: 'lora-models', label: 'LoRA Models', title: '风格 LoRA 模板', desc: '针对角色、材质、海报和品牌风格整理的训练模型合集。', meta: '模型资源', to: '/products?search=LoRA', cover: '' },
-  { id: 'design-assets', label: 'Design Assets', title: '设计交付素材包', desc: '围绕封面、海报、社媒图和演示文稿场景准备的交付级素材。', meta: '素材方向', to: '/products?search=设计', cover: '' },
-]
-
 const showcaseItems = computed(() => {
-  if (!featured.value.length) return fallbackShowcase
   return featured.value.slice(0, 4).map((item, index) => ({
     id: `product-${item.id}`,
     label: item.category_name || `精选资源 ${index + 1}`,
