@@ -602,7 +602,7 @@ onUnmounted(() => {
   width: 100%;
   border: 1px solid var(--glass-border);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.74);
+  background: var(--glass-bg);
   padding: 0 var(--sp-4);
   color: var(--text-primary);
   font-size: var(--text-sm);
@@ -645,7 +645,7 @@ onUnmounted(() => {
   padding: var(--sp-4);
   border: 1px solid var(--glass-border);
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.68);
+  background: var(--glass-bg);
 }
 
 .asset-preview {
@@ -699,7 +699,7 @@ onUnmounted(() => {
   padding: var(--sp-4);
   border: 1px solid var(--glass-border);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.68);
+  background: var(--glass-bg);
 }
 
 .gallery-row {

@@ -22,47 +22,66 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
+import { gsap } from '../composables/useGsap'
 
 defineProps({ product: { type: Object, required: true } })
 
 const cardRef = ref(null)
-let rafId = 0
-let cachedRect = null
+let quickRotateX = null
+let quickRotateY = null
+let quickShineX = null
+let quickShineY = null
+let cardEl = null
+const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+let rafId = null
+
+function ensureQuickTo() {
+  if (quickRotateX) return
+  cardEl = cardRef.value?.$el || cardRef.value
+  if (!cardEl) return
+  quickRotateX = gsap.quickTo(cardEl, '--rx', { duration: 0.4, ease: 'power2.out' })
+  quickRotateY = gsap.quickTo(cardEl, '--ry', { duration: 0.4, ease: 'power2.out' })
+  const shine = cardEl.querySelector('.card-shine')
+  if (shine) {
+    quickShineX = gsap.quickTo(shine, '--sx', { duration: 0.3 })
+    quickShineY = gsap.quickTo(shine, '--sy', { duration: 0.3 })
+  }
+}
 
 function onMouseMove(e) {
-  if (rafId) cancelAnimationFrame(rafId)
+  if (isTouch) return
+  if (rafId) return
   rafId = requestAnimationFrame(() => {
-    const card = cardRef.value?.$el || cardRef.value
-    if (!card) return
-    cachedRect = card.getBoundingClientRect()
-    const rect = cachedRect
+    rafId = null
+    ensureQuickTo()
+    if (!cardEl) return
+    const rect = cardEl.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
     const centerX = rect.width / 2
     const centerY = rect.height / 2
-    const rotateX = (y - centerY) / centerY * -4
-    const rotateY = (x - centerX) / centerX * 4
-
-    card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`
-
-    const shine = card.querySelector('.card-shine')
-    if (shine) {
-      shine.style.opacity = '1'
-      shine.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.15) 0%, transparent 60%)`
-    }
+    quickRotateX?.((y - centerY) / centerY * -5)
+    quickRotateY?.((x - centerX) / centerX * 5)
+    quickShineX?.(x)
+    quickShineY?.(y)
   })
 }
 
 function onMouseLeave() {
-  if (rafId) cancelAnimationFrame(rafId)
-  rafId = 0
-  const card = cardRef.value?.$el || cardRef.value
-  if (!card) return
-  card.style.transform = ''
-  const shine = card.querySelector('.card-shine')
-  if (shine) shine.style.opacity = '0'
+  if (!cardEl) return
+  quickRotateX?.(0)
+  quickRotateY?.(0)
+  const shine = cardEl.querySelector('.card-shine')
+  if (shine) gsap.to(shine, { opacity: 0, duration: 0.3 })
 }
+
+onUnmounted(() => {
+  quickRotateX = null
+  quickRotateY = null
+  quickShineX = null
+  quickShineY = null
+})
 </script>
 
 <style scoped>
@@ -72,9 +91,12 @@ function onMouseLeave() {
   border-radius: var(--r-lg);
   overflow: hidden;
   border: 1px solid var(--glass-border);
-  transition: transform 0.4s var(--ease-spring), box-shadow var(--dur-normal) var(--ease-out), border-color var(--dur-normal);
   text-decoration: none;
   transform-style: preserve-3d;
+  --rx: 0deg;
+  --ry: 0deg;
+  transform: perspective(800px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(-2px);
+  transition: transform 0.4s var(--ease-spring), box-shadow var(--dur-normal) var(--ease-out), border-color var(--dur-normal);
 }
 .card:hover {
   box-shadow: 0 20px 40px rgba(10,10,26,0.12);
@@ -94,8 +116,9 @@ function onMouseLeave() {
 
 .card-shine {
   position: absolute; inset: 0; opacity: 0;
-  transition: opacity var(--dur-fast); pointer-events: none;
-  z-index: 2;
+  pointer-events: none; z-index: 2;
+  --sx: 50%; --sy: 50%;
+  background: radial-gradient(circle at var(--sx) var(--sy), rgba(255,255,255,0.15) 0%, transparent 60%);
 }
 
 .card-badge {

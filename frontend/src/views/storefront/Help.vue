@@ -58,7 +58,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { gsap, ScrollTrigger } from '../../composables/useGsap.js'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import StoreAccountNav from '../../components/StoreAccountNav.vue'
 import StorePageHeader from '../../components/StorePageHeader.vue'
@@ -66,13 +67,45 @@ import StorePageHeader from '../../components/StorePageHeader.vue'
 const openFaq = ref(null)
 
 const faqs = [
-  { q: '购买后如何下载商品？', a: '支付完成后，在“我的下载”页即可看到已购买的商品，点击下载按钮即可获取。' },
+  { q: '购买后如何下载商品？', a: '支付完成后，在”我的下载”页即可看到已购买的商品，点击下载按钮即可获取。' },
   { q: '支持哪些支付方式？', a: '当前提供系统默认支付流程，后续可按业务需要接入更多支付方式。' },
   { q: '购买后可以退款吗？', a: '数字商品一经购买通常不支持无理由退款，如遇异常情况请联系支持处理。' },
   { q: '商品可以商用吗？', a: '不同资源的授权范围不同，请以商品详情页的授权说明为准。' },
-  { q: '如何查看订单状态？', a: '在“我的订单”页可以查看待支付、已支付、已完成和已取消等状态。' },
+  { q: '如何查看订单状态？', a: '在”我的订单”页可以查看待支付、已支付、已完成和已取消等状态。' },
   { q: '账户安全如何保障？', a: '系统使用标准鉴权与安全传输机制，敏感信息不会以明文形式存储。' },
 ]
+
+let ctx = null
+
+onMounted(() => {
+  nextTick(() => {
+    const items = document.querySelectorAll('.faq-item')
+    const supportItems = document.querySelectorAll('.support-item')
+    if (!items.length && !supportItems.length) return
+    ctx = gsap.context(() => {
+      gsap.set(items, { opacity: 0, y: 16 })
+      ScrollTrigger.batch(items, {
+        start: 'top 88%',
+        once: true,
+        onEnter(batch) {
+          gsap.to(batch, { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power3.out' })
+        },
+      })
+      if (supportItems.length) {
+        gsap.set(supportItems, { opacity: 0, y: 12 })
+        ScrollTrigger.batch(supportItems, {
+          start: 'top 90%',
+          once: true,
+          onEnter(batch) {
+            gsap.to(batch, { opacity: 1, y: 0, duration: 0.35, stagger: 0.06, ease: 'power3.out' })
+          },
+        })
+      }
+    })
+  })
+})
+
+onUnmounted(() => ctx?.revert())
 </script>
 
 <style scoped>
@@ -122,7 +155,7 @@ const faqs = [
 
 .faq-expand-enter-active,
 .faq-expand-leave-active {
-  transition: all 0.24s ease;
+  transition: opacity 0.24s ease, transform 0.24s ease;
 }
 
 .faq-expand-enter-from,

@@ -64,6 +64,7 @@
                 <div class="order-card__bottom">
                   <span class="order-total-label">应付金额</span>
                   <span class="order-total-value">¥{{ order.pay_amount_yuan }}</span>
+                  <button v-if="order.status === 'pending'" class="cancel-btn" type="button" @click.stop="handleCancel(order)">取消订单</button>
                 </div>
               </article>
 
@@ -84,8 +85,10 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { getOrders } from '../../api/order'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { gsap } from '../../composables/useGsap.js'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { getOrders, cancelOrder } from '../../api/order'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import StatusBadge from '../../components/StatusBadge.vue'
 import StoreAccountNav from '../../components/StoreAccountNav.vue'
@@ -128,7 +131,21 @@ async function fetchOrders() {
   }
 }
 
+async function handleCancel(order) {
+  try {
+    await ElMessageBox.confirm('确定取消这笔订单吗？', '取消订单')
+    await cancelOrder(order.id)
+    ElMessage.success('订单已取消')
+    await fetchOrders()
+  } catch {}
+}
+
+let ctx = null
+
 onMounted(fetchOrders)
+onUnmounted(() => ctx?.revert())
+
+// GSAP entrance animations removed — gsap.from() caused elements to stay invisible
 </script>
 
 <style scoped>
@@ -164,7 +181,6 @@ onMounted(fetchOrders)
 .order-card {
   cursor: pointer;
   padding: var(--sp-5);
-  animation: fadeInUp 0.45s var(--ease-out) both;
 }
 
 .order-card__top,
@@ -232,5 +248,26 @@ onMounted(fetchOrders)
 .order-total-label {
   color: var(--text-secondary);
   font-size: var(--text-sm);
+}
+
+.cancel-btn {
+  height: 32px;
+  padding: 0 var(--sp-4);
+  margin-left: auto;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  background: var(--glass-bg);
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.cancel-btn:hover {
+  border-color: #f87171;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.08);
 }
 </style>

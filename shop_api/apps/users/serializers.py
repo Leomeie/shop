@@ -47,8 +47,17 @@ class RegisterSerializer(serializers.Serializer):
         value = value.strip()
         if not re.fullmatch(r"[A-Za-z0-9_]+", value):
             raise serializers.ValidationError("用户名只能包含字母、数字或下划线")
+        if value.isdigit():
+            raise serializers.ValidationError("用户名不能为纯数字")
         if User.objects.filter(username__iexact=value).exists():
             raise serializers.ValidationError("该用户名已存在，请更换一个新的用户名")
+        return value
+
+    def validate_password(self, value):
+        if not re.search(r"[A-Za-z]", value):
+            raise serializers.ValidationError("密码必须包含至少一个字母")
+        if not re.search(r"\d", value):
+            raise serializers.ValidationError("密码必须包含至少一个数字")
         return value
 
     def validate(self, data):

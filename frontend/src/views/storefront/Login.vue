@@ -1,8 +1,12 @@
 <template>
   <div class="auth-shell">
     <section class="auth-shell__aside">
+      <div class="auth-aside-bg">
+        <div class="auth-orb auth-orb-1" />
+        <div class="auth-orb auth-orb-2" />
+      </div>
       <router-link to="/" class="auth-brand">
-        <span class="auth-brand__mark">S</span>
+        <img src="/images/logo.png" alt="ShopEase" class="auth-brand__icon" width="40" height="40" />
         <span class="auth-brand__text">ShopEase</span>
       </router-link>
 
@@ -15,6 +19,13 @@
           <div v-for="feature in visualFeatures" :key="feature.text" class="benefit-item">
             <AnimatedIcons :name="feature.icon" :size="18" />
             <span>{{ feature.text }}</span>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div v-for="stat in stats" :key="stat.label" class="stat-card">
+            <span class="stat-num">{{ stat.num }}</span>
+            <span class="stat-label">{{ stat.label }}</span>
           </div>
         </div>
       </div>
@@ -71,8 +82,9 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { gsap } from '../../composables/useGsap.js'
 import { ElMessage } from 'element-plus'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import { useUserStore } from '../../stores/user'
@@ -92,6 +104,12 @@ const visualFeatures = [
   { icon: 'shield', text: '账户与交易状态持续同步' },
 ]
 
+const stats = [
+  { num: '1000+', label: '数字商品' },
+  { num: '5000+', label: '创作者用户' },
+  { num: '99%', label: '高满意反馈' },
+]
+
 function applyValidation(result) {
   fieldErrors.username = result.fieldErrors.username || ''
   fieldErrors.password = result.fieldErrors.password || ''
@@ -108,6 +126,14 @@ function validateField(name) {
     fieldErrors.password = result.fieldErrors.password || ''
   }
 }
+
+let ctx = null
+
+onMounted(() => {
+  // GSAP entrance animations removed — gsap.from() caused elements to stay invisible
+})
+
+onUnmounted(() => ctx?.revert())
 
 async function handleLogin() {
   if (!applyValidation(validateLoginForm(form))) return
@@ -139,14 +165,57 @@ async function handleLogin() {
 }
 
 .auth-shell__aside {
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: var(--sp-8);
+  justify-content: center;
+  padding: var(--sp-10) var(--sp-8);
   background:
     radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 40%),
     var(--surface-1);
   border-right: 1px solid var(--glass-border);
+  overflow: hidden;
+}
+
+.auth-aside-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.auth-orb-1 {
+  width: 300px;
+  height: 300px;
+  bottom: -80px;
+  right: -60px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%);
+  animation: authOrbFloat 8s ease-in-out infinite;
+}
+
+.auth-orb-2 {
+  width: 200px;
+  height: 200px;
+  top: 30%;
+  left: -40px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  animation: authOrbFloat 6s ease-in-out infinite reverse;
+}
+
+@keyframes authOrbFloat {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(10px, -15px); }
+}
+
+.auth-shell__aside > * {
+  position: relative;
+  z-index: 1;
 }
 
 .auth-brand {
@@ -159,15 +228,11 @@ async function handleLogin() {
   font-weight: 700;
 }
 
-.auth-brand__mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.auth-brand__icon {
   width: 40px;
   height: 40px;
   border-radius: 14px;
-  background: var(--gradient-blue);
-  color: var(--white);
+  object-fit: contain;
 }
 
 .auth-shell__copy {
@@ -217,6 +282,36 @@ async function handleLogin() {
   background: var(--glass-bg);
   color: var(--text-secondary);
   font-size: var(--text-sm);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-8);
+}
+
+.stats-grid .stat-card {
+  display: grid;
+  gap: 6px;
+  padding: var(--sp-4);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  background: var(--glass-bg);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+.stats-grid .stat-num {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 800;
+}
+
+.stats-grid .stat-label {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
 }
 
 .auth-shell__form-area {

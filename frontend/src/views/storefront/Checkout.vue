@@ -23,7 +23,7 @@
               <div class="checkout-items">
                 <article v-for="item in cartStore.selectedItems" :key="item.sku_id" class="checkout-row">
                   <div class="checkout-row__thumb">
-                    <img :src="item.image" :alt="item.product_name" />
+                    <img :src="item.image" :alt="item.product_name" loading="lazy" />
                   </div>
                   <div class="checkout-row__main">
                     <h3>{{ item.product_name }}</h3>
@@ -94,8 +94,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { gsap } from '../../composables/useGsap.js'
 import { ElMessage } from 'element-plus'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import StorePageHeader from '../../components/StorePageHeader.vue'
@@ -106,6 +107,14 @@ const router = useRouter()
 const cartStore = useCartStore()
 const remark = ref('')
 const loading = ref(false)
+
+let ctx = null
+
+onMounted(() => {
+  // GSAP entrance animations removed — gsap.from() caused elements to stay invisible
+})
+
+onUnmounted(() => ctx?.revert())
 
 async function handleCreateOrder() {
   loading.value = true

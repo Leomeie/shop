@@ -92,7 +92,7 @@
 
               <div class="summary-rail__actions">
                 <template v-if="order.status === 'pending'">
-                  <button class="action-primary" type="button" @click="handlePay">立即支付</button>
+                  <button class="action-primary" type="button" @click="showPayModal = true">立即支付</button>
                   <button class="action-ghost" type="button" @click="handleCancel">取消订单</button>
                 </template>
 
@@ -106,6 +106,13 @@
         </div>
       </div>
     </div>
+
+    <WechatPayModal
+      :visible="showPayModal"
+      :amount="order?.pay_amount_yuan"
+      @close="showPayModal = false"
+      @confirmed="handlePayConfirm"
+    />
   </div>
 </template>
 
@@ -115,12 +122,14 @@ import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import StorePageHeader from '../../components/StorePageHeader.vue'
+import WechatPayModal from '../../components/WechatPayModal.vue'
 import { cancelOrder, getOrder } from '../../api/order'
 import { createPayment, paymentCallback } from '../../api/payment'
 
 const route = useRoute()
 const order = ref(null)
 const loading = ref(false)
+const showPayModal = ref(false)
 
 const statusIcon = computed(() => {
   const map = { pending: 'calendar', completed: 'check', cancelled: 'close', paid: 'send' }
@@ -141,13 +150,15 @@ onMounted(async () => {
   }
 })
 
-async function handlePay() {
+async function handlePayConfirm() {
   try {
     const payRes = await createPayment({ order_id: order.value.id, method: 'mock' })
     await paymentCallback({ payment_no: payRes.data.payment_no })
+    showPayModal.value = false
     ElMessage.success('支付成功')
     await refreshOrder()
   } catch (error) {
+    showPayModal.value = false
     ElMessage.error(error.message || '支付失败')
   }
 }

@@ -1,8 +1,12 @@
 <template>
   <div class="auth-shell">
     <section class="auth-shell__aside">
+      <div class="auth-aside-bg">
+        <div class="auth-orb auth-orb-1" />
+        <div class="auth-orb auth-orb-2" />
+      </div>
       <router-link to="/" class="auth-brand">
-        <span class="auth-brand__mark">S</span>
+        <img src="/images/logo.png" alt="ShopEase" class="auth-brand__icon" width="40" height="40" />
         <span class="auth-brand__text">ShopEase</span>
       </router-link>
 
@@ -31,8 +35,8 @@
         <div class="helper-panel">
           <div class="helper-panel__label">注册规则</div>
           <ul>
-            <li>用户名需要 3-20 位，只能包含字母、数字或下划线。</li>
-            <li>密码需要 6-20 位，请避免过于简单。</li>
+            <li>用户名需要 3-20 位，只能包含字母、数字或下划线，不能为纯数字。</li>
+            <li>密码需要 6-20 位，且必须同时包含字母和数字。</li>
             <li>确认密码必须与密码保持一致。</li>
           </ul>
         </div>
@@ -82,8 +86,9 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { gsap } from '../../composables/useGsap.js'
 import { ElMessage } from 'element-plus'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import { useUserStore } from '../../stores/user'
@@ -114,6 +119,14 @@ function validateField(name) {
   const result = validateRegisterForm(form)
   fieldErrors[name] = result.fieldErrors[name] || ''
 }
+
+let ctx = null
+
+onMounted(() => {
+  // GSAP entrance animations removed — gsap.from() caused elements to stay invisible
+})
+
+onUnmounted(() => ctx?.revert())
 
 async function handleRegister() {
   if (!applyValidation(validateRegisterForm(form))) return
@@ -150,14 +163,57 @@ async function handleRegister() {
 }
 
 .auth-shell__aside {
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: var(--sp-8);
+  justify-content: center;
+  padding: var(--sp-10) var(--sp-8);
   background:
     radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 40%),
     var(--surface-1);
   border-right: 1px solid var(--glass-border);
+  overflow: hidden;
+}
+
+.auth-aside-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.auth-orb-1 {
+  width: 300px;
+  height: 300px;
+  bottom: -80px;
+  right: -60px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%);
+  animation: authOrbFloat 8s ease-in-out infinite;
+}
+
+.auth-orb-2 {
+  width: 200px;
+  height: 200px;
+  top: 30%;
+  left: -40px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  animation: authOrbFloat 6s ease-in-out infinite reverse;
+}
+
+@keyframes authOrbFloat {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(10px, -15px); }
+}
+
+.auth-shell__aside > * {
+  position: relative;
+  z-index: 1;
 }
 
 .auth-brand {
@@ -170,15 +226,11 @@ async function handleRegister() {
   font-weight: 700;
 }
 
-.auth-brand__mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.auth-brand__icon {
   width: 40px;
   height: 40px;
   border-radius: 14px;
-  background: var(--gradient-blue);
-  color: var(--white);
+  object-fit: contain;
 }
 
 .auth-shell__copy {

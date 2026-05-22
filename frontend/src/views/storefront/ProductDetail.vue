@@ -122,8 +122,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { gsap } from '../../composables/useGsap.js'
 import { ElMessage } from 'element-plus'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import StorePageHeader from '../../components/StorePageHeader.vue'
@@ -171,6 +172,8 @@ const tabs = [
   { key: 'reviews', label: '评价' },
 ]
 
+let ctx = null
+
 onMounted(async () => {
   loading.value = true
   try {
@@ -179,8 +182,15 @@ onMounted(async () => {
     if (product.value.skus?.length) selectedSku.value = product.value.skus[0]
   } finally {
     loading.value = false
+    nextTick(animateEntrance)
   }
 })
+
+onUnmounted(() => ctx?.revert())
+
+function animateEntrance() {
+  // GSAP entrance animations removed — gsap.from() caused elements to stay invisible
+}
 
 function onGalleryMove(e) {
   const rect = galleryRef.value.getBoundingClientRect()

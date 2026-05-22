@@ -130,21 +130,13 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-# Redis
-REDIS_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")
-
+# Cache — database-backed (no Redis needed)
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_URL,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "cache_table",
     }
 }
-
-# Cart settings
-CART_TTL = 60 * 60 * 24 * 7  # 7 days
 
 # Order settings
 ORDER_UNPAID_TIMEOUT = 30 * 60  # 30 minutes

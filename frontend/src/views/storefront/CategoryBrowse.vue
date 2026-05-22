@@ -45,7 +45,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { gsap } from '../../composables/useGsap.js'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import StorePageHeader from '../../components/StorePageHeader.vue'
 import { getCategories } from '../../api/product'
@@ -61,6 +62,8 @@ const iconColors = [
   { bg: '#f4efff', fg: '#6953c7' },
 ]
 
+let ctx = null
+
 onMounted(async () => {
   loading.value = true
   try {
@@ -70,8 +73,24 @@ onMounted(async () => {
     categories.value = []
   } finally {
     loading.value = false
+    nextTick(animateCards)
   }
 })
+
+onUnmounted(() => ctx?.revert())
+
+watch(categories, () => nextTick(animateCards))
+
+function animateCards() {
+  ctx?.revert()
+  const cards = document.querySelectorAll('.category-card')
+  if (!cards.length) return
+  ctx = gsap.context(() => {
+    gsap.from(cards, {
+      opacity: 0, y: 24, duration: 0.5, stagger: 0.06, ease: 'power3.out',
+    })
+  })
+}
 </script>
 
 <style scoped>

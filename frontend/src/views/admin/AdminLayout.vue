@@ -2,7 +2,7 @@
   <div class="admin-layout admin-shell">
     <aside class="admin-sidebar">
       <div class="admin-sidebar__brand">
-        <span class="brand-mark">S</span>
+        <img src="/images/logo.png" alt="ShopEase" class="brand-icon" width="42" height="42" />
         <div>
           <div class="brand-name">ShopEase</div>
           <div class="brand-subtitle">Operator Console</div>
@@ -117,18 +117,11 @@ const activeMenuName = computed(() => {
   background: rgba(255, 255, 255, 0.04);
 }
 
-.brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.brand-icon {
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: rgba(198, 168, 106, 0.18);
-  color: var(--white);
-  font-family: var(--font-display);
-  font-size: var(--text-lg);
-  font-weight: 800;
+  object-fit: contain;
 }
 
 .brand-name {
@@ -161,7 +154,7 @@ const activeMenuName = computed(() => {
   font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: 500;
-  transition: all var(--dur-fast) var(--ease-out);
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
 
 .admin-nav__item:hover {
@@ -200,13 +193,13 @@ const activeMenuName = computed(() => {
   justify-content: space-between;
   gap: var(--sp-4);
   padding: var(--sp-5) var(--sp-8);
-  border-bottom: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.76);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(16px);
 }
 
 .admin-topbar__eyebrow {
-  color: var(--accent);
+  color: #60a5fa;
   font-family: var(--font-display);
   font-size: 11px;
   font-weight: 700;
@@ -216,7 +209,7 @@ const activeMenuName = computed(() => {
 
 .admin-topbar__title {
   margin-top: 6px;
-  color: var(--text-primary);
+  color: #e2e8f0;
   font-family: var(--font-display);
   font-size: 1.6rem;
   font-weight: 800;
@@ -236,22 +229,22 @@ const activeMenuName = computed(() => {
   width: 38px;
   height: 38px;
   border-radius: 999px;
-  background: var(--glass-border);
-  color: var(--text-primary);
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
   font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: 700;
 }
 
 .user-name {
-  color: var(--text-primary);
+  color: #e2e8f0;
   font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: 600;
 }
 
 .user-role {
-  color: var(--text-muted);
+  color: #64748b;
   font-size: 11px;
 }
 

@@ -137,8 +137,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { gsap } from '../../composables/useGsap.js'
 import { getCategories, getProducts } from '../../api/product'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import ProductCard from '../../components/ProductCard.vue'
@@ -234,6 +235,28 @@ onMounted(async () => {
   }
 })
 
+let gridCtx = null
+
+function animateGrid() {
+  gridCtx?.revert()
+  const grid = document.querySelector('.product-grid')
+  if (!grid) return
+  const items = grid.querySelectorAll('.grid-item')
+  if (!items.length) return
+  gridCtx = gsap.context(() => {
+    gsap.from(items, {
+      opacity: 0, y: 24, duration: 0.45, ease: 'power3.out',
+      stagger: 0.06, clearProps: 'all',
+    })
+  }, grid)
+}
+
+watch(() => products.value, () => {
+  nextTick(animateGrid)
+}, { flush: 'post' })
+
+onUnmounted(() => gridCtx?.revert())
+
 watch(
   () => route.query,
   () => {
@@ -266,10 +289,7 @@ watch(
 }
 
 .grid-item {
-  opacity: 0;
-  transform: translateY(24px);
-  animation: fadeInUp 0.45s var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 70ms);
+  /* GSAP handles entrance animation */
 }
 
 .skeleton-card {

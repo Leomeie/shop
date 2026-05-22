@@ -58,6 +58,9 @@ export function validateRegisterForm(form) {
   } else if (!/^[A-Za-z0-9_]+$/.test(username)) {
     fieldErrors.username = '用户名只能包含字母、数字或下划线'
     summaryLines.push('用户名包含不支持的字符')
+  } else if (/^\d+$/.test(username)) {
+    fieldErrors.username = '用户名不能为纯数字'
+    summaryLines.push('用户名不能为纯数字')
   }
 
   if (!password) {
@@ -69,6 +72,12 @@ export function validateRegisterForm(form) {
   } else if (password.length > 20) {
     fieldErrors.password = '密码不能超过 20 个字符'
     summaryLines.push('密码过长')
+  } else if (!/[A-Za-z]/.test(password)) {
+    fieldErrors.password = '密码必须包含至少一个字母'
+    summaryLines.push('密码必须包含至少一个字母')
+  } else if (!/\d/.test(password)) {
+    fieldErrors.password = '密码必须包含至少一个数字'
+    summaryLines.push('密码必须包含至少一个数字')
   }
 
   if (!passwordConfirm) {
@@ -108,8 +117,8 @@ export function parseAuthApiError(error, mode = 'login') {
     summaryLines.push('请确认密码是否完整输入，且没有多余空格。')
     summaryLines.push('管理员请使用用户名登录，例如：admin。')
   } else {
-    summaryLines.push('用户名需为 3-20 位，只能包含字母、数字或下划线。')
-    summaryLines.push('密码需为 6-20 位，并与确认密码保持一致。')
+    summaryLines.push('用户名需为 3-20 位，只能包含字母、数字或下划线，不能为纯数字。')
+    summaryLines.push('密码需为 6-20 位，必须同时包含字母和数字，并与确认密码保持一致。')
     summaryLines.push('如果提示用户名已存在，请更换一个新的用户名。')
   }
 

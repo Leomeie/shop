@@ -30,7 +30,7 @@
                   </label>
 
                   <div class="item-thumb">
-                    <img :src="item.image" :alt="item.product_name" />
+                    <img :src="item.image" :alt="item.product_name" loading="lazy" />
                   </div>
 
                   <div class="item-main">
@@ -119,21 +119,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import StorePageHeader from '../../components/StorePageHeader.vue'
 import { useCartStore } from '../../stores/cart'
 
 const cartStore = useCartStore()
 const qtyPulse = ref(null)
+let qtyTimer = null
 
 function handleQtyChange(skuId, qty) {
   cartStore.updateItem(skuId, { quantity: qty })
   qtyPulse.value = skuId
-  setTimeout(() => {
+  clearTimeout(qtyTimer)
+  qtyTimer = setTimeout(() => {
     qtyPulse.value = null
   }, 400)
 }
+
+onUnmounted(() => clearTimeout(qtyTimer))
 </script>
 
 <style scoped>
@@ -176,7 +180,7 @@ function handleQtyChange(skuId, qty) {
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   color: transparent;
-  transition: all var(--dur-fast) var(--ease-out);
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
 
 .item-check input:checked + .checkmark {

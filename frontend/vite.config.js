@@ -20,5 +20,13 @@ export default defineConfig({
     target: 'es2015',
     outDir: 'dist',
     sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/element-plus')) return 'element-plus'
+          if (id.includes('node_modules/gsap')) return 'gsap-vendor'
+        },
+      },
+    },
   },
 })

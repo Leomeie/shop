@@ -5,7 +5,7 @@
     <header :class="navClasses">
       <div class="container nav-inner">
         <router-link to="/" class="logo">
-          <span class="logo-mark">S</span>
+          <img src="/images/logo.png" alt="ShopEase" class="logo-icon" width="36" height="36" />
           <span class="logo-text"><GradientText variant="blue">ShopEase</GradientText></span>
         </router-link>
 
@@ -99,6 +99,7 @@
 
           <template v-else>
             <router-link to="/login" class="nav-btn login-btn">登录</router-link>
+            <router-link to="/register" class="nav-btn register-btn">免费注册</router-link>
           </template>
         </nav>
       </div>
@@ -106,7 +107,7 @@
 
     <main :class="['main', { 'main-home': isHome }]">
       <router-view v-slot="{ Component }">
-        <Transition name="page" mode="out-in">
+        <Transition mode="out-in" :css="false" @leave="onLeave" @enter="onEnter">
           <component :is="Component" />
         </Transition>
       </router-view>
@@ -116,7 +117,7 @@
       <div class="container footer-inner">
         <div class="footer-left">
           <div class="footer-brand">
-            <span class="logo-mark">S</span>
+            <img src="/images/logo.png" alt="ShopEase" class="logo-icon" width="28" height="28" />
             <span>ShopEase</span>
           </div>
           <p class="footer-copy">© 2026 ShopEase · AI 数字精品店</p>
@@ -133,19 +134,19 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '../../stores/user'
 import { useCartStore } from '../../stores/cart'
-import { useAppStore } from '../../stores/app'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import GradientText from '../../components/GradientText.vue'
+import { usePageTransition } from '../../composables/usePageTransition'
 
 const router = useRouter()
 const route = useRoute()
+const { onLeave, onEnter, scrollToTop } = usePageTransition()
 const userStore = useUserStore()
 const cartStore = useCartStore()
-const appStore = useAppStore()
 
 const keyword = ref('')
 const menuOpen = ref(false)
@@ -154,20 +155,17 @@ const scrollProgress = ref(0)
 const searchOpen = ref(false)
 
 const isHome = computed(() => route.name === 'Home')
-const navHidden = computed(() => isHome.value && appStore.homeSlide === 0)
-const isHomeDark = computed(() => isHome.value && (appStore.homeSlide === 1 || appStore.homeSlide === 3))
-const isHomeTransparent = computed(() => isHome.value && appStore.homeSlide === 0)
-const isHomeLight = computed(() => isHome.value && appStore.homeSlide === 2)
+
+watch(() => route.fullPath, () => {
+  nextTick(scrollToTop)
+})
 
 const navClasses = computed(() => [
   'nav',
   {
-    scrolled: isScrolled.value && (!isHome.value || isHomeLight.value),
+    scrolled: isScrolled.value,
     'nav-home': isHome.value,
-    'nav-hidden': navHidden.value,
-    'nav-on-dark': isHomeDark.value,
-    'nav-transparent': isHomeTransparent.value,
-    'nav-home-light': isHomeLight.value,
+    'nav-on-dark': isHome.value,
   },
 ])
 
@@ -228,44 +226,20 @@ onUnmounted(() => {
   right: 0;
   z-index: 40;
   height: var(--nav-h);
-  background: var(--glass-bg);
+  background: rgba(15, 23, 42, 0.92);
   border-bottom: 1px solid var(--glass-border);
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
   transition:
-    background var(--dur-normal) var(--ease-out),
     border-color var(--dur-normal) var(--ease-out),
-    box-shadow var(--dur-normal) var(--ease-out),
-    transform var(--dur-normal) var(--ease-out);
+    box-shadow var(--dur-normal) var(--ease-out);
 }
 
 .nav.scrolled {
   box-shadow: var(--glass-shadow);
 }
 
-.nav-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(-100%);
-  box-shadow: none;
-}
-
 .nav-home.nav-on-dark {
   border-bottom-color: var(--glass-border);
   background: var(--glass-bg);
-}
-
-.nav-home.nav-transparent {
-  border-bottom-color: transparent;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.66) 0%, rgba(15, 23, 42, 0.18) 70%, rgba(15, 23, 42, 0) 100%);
-  box-shadow: none;
-  transition-property: opacity, transform, box-shadow;
-}
-
-.nav-home.nav-home-light {
-  background: var(--glass-bg-light);
-  border-bottom-color: var(--glass-border);
 }
 
 .nav-inner {
@@ -286,21 +260,15 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.logo-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.logo-icon {
   width: 36px;
   height: 36px;
   border-radius: var(--r-sm);
-  background: var(--gradient-blue);
-  color: var(--white);
-  font-size: var(--text-lg);
-  font-weight: 800;
+  object-fit: contain;
   transition: transform var(--dur-normal) var(--ease-spring);
 }
 
-.logo:hover .logo-mark {
+.logo:hover .logo-icon {
   transform: rotate(-8deg) scale(1.05);
 }
 
@@ -319,7 +287,7 @@ onUnmounted(() => {
   border-radius: var(--r-full);
   background: var(--glass-bg);
   color: var(--text-faint);
-  transition: all var(--dur-normal) var(--ease-out);
+  transition: background var(--dur-normal) var(--ease-out), color var(--dur-normal) var(--ease-out), border-color var(--dur-normal) var(--ease-out);
 }
 
 .search-box:focus-within {
@@ -359,7 +327,7 @@ onUnmounted(() => {
   font-size: var(--text-sm);
   font-weight: 500;
   text-decoration: none;
-  transition: all var(--dur-fast);
+  transition: color var(--dur-fast);
 }
 
 .nav-link:hover {
@@ -378,7 +346,7 @@ onUnmounted(() => {
   border-radius: var(--r-full);
   background: transparent;
   color: var(--text-secondary);
-  transition: all var(--dur-normal) var(--ease-spring);
+  transition: color var(--dur-normal) var(--ease-spring), background var(--dur-normal) var(--ease-spring), transform var(--dur-normal) var(--ease-spring);
 }
 
 .nav-btn:hover {
@@ -423,6 +391,24 @@ onUnmounted(() => {
   box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
 }
 
+.register-btn {
+  width: auto;
+  padding: 0 var(--sp-5);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.register-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent);
+  color: var(--white);
+}
+
 .user-avatar,
 .dropdown-avatar {
   display: flex;
@@ -439,7 +425,7 @@ onUnmounted(() => {
   width: 32px;
   height: 32px;
   font-size: var(--text-sm);
-  transition: all 0.3s;
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
   border: 2px solid transparent;
 }
 
@@ -462,9 +448,7 @@ onUnmounted(() => {
   padding: var(--sp-2);
   border: 1px solid var(--glass-border);
   border-radius: var(--r-md);
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(15, 23, 42, 0.95);
   box-shadow: var(--glass-shadow);
 }
 
@@ -512,7 +496,7 @@ onUnmounted(() => {
   font-size: var(--text-sm);
   text-align: left;
   text-decoration: none;
-  transition: all var(--dur-fast);
+  transition: color var(--dur-fast), background var(--dur-fast);
 }
 
 .dropdown-item:hover {
@@ -528,7 +512,7 @@ onUnmounted(() => {
 
 .dropdown-enter-active,
 .dropdown-leave-active {
-  transition: all var(--dur-normal) var(--ease-out);
+  transition: opacity var(--dur-normal) var(--ease-out), transform var(--dur-normal) var(--ease-out);
 }
 
 .dropdown-enter-from,
@@ -542,30 +526,12 @@ onUnmounted(() => {
 }
 
 .badge-pop-leave-active {
-  transition: all 0.2s ease-in;
+  transition: opacity 0.2s ease-in;
 }
 
 .badge-pop-leave-to {
   opacity: 0;
   transform: scale(0.5);
-}
-
-.page-enter-active {
-  transition: all 0.45s var(--ease-out);
-}
-
-.page-leave-active {
-  transition: all 0.2s ease-in;
-}
-
-.page-enter-from {
-  opacity: 0;
-  transform: translateY(16px) scale(0.99);
-}
-
-.page-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
 }
 
 .main {
@@ -605,10 +571,9 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
-.footer-brand .logo-mark {
+.footer-brand .logo-icon {
   width: 28px;
   height: 28px;
-  font-size: var(--text-sm);
 }
 
 .footer-copy {
@@ -680,8 +645,7 @@ onUnmounted(() => {
     max-width: none;
     padding: var(--sp-4);
     background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(15, 23, 42, 0.95);
     z-index: 39;
     box-shadow: var(--glass-shadow);
     transform: translateY(-100%);

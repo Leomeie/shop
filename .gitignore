@@ -24,6 +24,16 @@ node_modules/
 frontend/dist/
 frontend/dist-ssr/
 
+# Archives & documents
+*.zip
+*.pdf
+
+# Personal assets
+frontend/public/images/money.jpg
+
+# Claude Code
+.claude/
+
 # IDE
 .idea/
 .vscode/
