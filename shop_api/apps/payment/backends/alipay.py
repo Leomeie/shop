@@ -61,8 +61,15 @@ class AlipayPaymentBackend(PaymentBackend):
         alipay_client_config = AlipayClientConfig()
         alipay_client_config.server_url = cfg["GATEWAY"]
         alipay_client_config.app_id = cfg["APPID"]
-        alipay_client_config.app_private_key = _format_pem_key(cfg["APP_PRIVATE_KEY"], "private")
-        alipay_client_config.alipay_public_key = _format_pem_key(cfg["ALIPAY_PUBLIC_KEY"], "public")
+
+        private_pem = _format_pem_key(cfg["APP_PRIVATE_KEY"], "private")
+        logger.info("Private key length: %d, starts: %s, ends: %s",
+                     len(private_pem), private_pem[:30], private_pem[-30:])
+        alipay_client_config.app_private_key = private_pem
+
+        public_pem = _format_pem_key(cfg["ALIPAY_PUBLIC_KEY"], "public")
+        logger.info("Public key length: %d, starts: %s", len(public_pem), public_pem[:30])
+        alipay_client_config.alipay_public_key = public_pem
 
         return DefaultAlipayClient(alipay_client_config=alipay_client_config, logger=logger)
 
