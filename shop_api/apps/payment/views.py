@@ -13,14 +13,16 @@ from common.response import success, error
 
 logger = logging.getLogger(__name__)
 
-BACKENDS = {
-    "mock": MockPaymentBackend(),
-    "alipay": AlipayPaymentBackend(),
-}
+_backend_instances = {}
 
 
 def get_backend(method="mock"):
-    return BACKENDS.get(method, BACKENDS["mock"])
+    if method not in _backend_instances:
+        if method == "alipay":
+            _backend_instances[method] = AlipayPaymentBackend()
+        else:
+            _backend_instances[method] = MockPaymentBackend()
+    return _backend_instances[method]
 
 
 def _complete_order(payment):

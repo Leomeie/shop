@@ -1,21 +1,17 @@
 import logging
 from django.conf import settings
-from alipay.aop.api.DefaultAlipayClient import DefaultAlipayClient
-from alipay.aop.api.domain.AlipayTradePagePayModel import AlipayTradePagePayModel
-from alipay.aop.api.domain.AlipayTradeQueryModel import AlipayTradeQueryModel
-from alipay.aop.api.request.AlipayTradePagePayRequest import AlipayTradePagePayRequest
-from alipay.aop.api.request.AlipayTradeQueryRequest import AlipayTradeQueryRequest
 from .base import PaymentBackend
 
 logger = logging.getLogger(__name__)
 
 
 class AlipayPaymentBackend(PaymentBackend):
-    """Alipay sandbox payment backend."""
+    """Alipay sandbox payment backend — lazy client init."""
 
-    def __init__(self):
-        cfg = getattr(settings, "ALIPAY", {})
-        self._client = DefaultAlipayClient(
+    def _get_client(self):
+        from alipay.aop.api.DefaultAlipayClient import DefaultAlipayClient
+        cfg = settings.ALIPAY
+        return DefaultAlipayClient(
             app_id=cfg["APPID"],
             app_private_key_string=cfg["APP_PRIVATE_KEY"],
             alipay_public_key_string=cfg["ALIPAY_PUBLIC_KEY"],
@@ -24,6 +20,11 @@ class AlipayPaymentBackend(PaymentBackend):
         )
 
     def create_payment(self, order, payment_no, amount) -> dict:
+        from alipay.aop.api.domain.AlipayTradePagePayModel import AlipayTradePagePayModel
+        from alipay.aop.api.request.AlipayTradePagePayRequest import AlipayTradePagePayRequest
+
+        client = self._get_client()
+
         model = AlipayTradePagePayModel()
         model.out_trade_no = payment_no
         model.total_amount = f"{amount / 100:.2f}"
@@ -31,10 +32,10 @@ class AlipayPaymentBackend(PaymentBackend):
         model.product_code = "FAST_INSTANT_TRADE_PAY"
 
         request = AlipayTradePagePayRequest(biz_model=model)
-        request.notify_url = f"{settings.ALIPAY['NOTIFY_URL']}"
-        request.return_url = f"{settings.ALIPAY['RETURN_URL']}"
+        request.notify_url = settings.ALIPAY["NOTIFY_URL"]
+        request.return_url = settings.ALIPAY["RETURN_URL"]
 
-        response = self._client.page_execute(request, http_method="GET")
+        response = client.page_execute(request, http_method="GET")
         return {
             "payment_no": payment_no,
             "status": "pending",
@@ -42,13 +43,17 @@ class AlipayPaymentBackend(PaymentBackend):
         }
 
     def query_payment(self, payment_no) -> dict:
+        from alipay.aop.api.domain.AlipayTradeQueryModel import AlipayTradeQueryModel
+        from alipay.aop.api.request.AlipayTradeQueryRequest import AlipayTradeQueryRequest
+
+        client = self._get_client()
+
         model = AlipayTradeQueryModel()
         model.out_trade_no = payment_no
 
         request = AlipayTradeQueryRequest(biz_model=model)
-        response = self._client.page_execute(request, http_method="GET")
+        response = client.page_execute(request, http_method="GET")
 
-        # Parse response
         if isinstance(response, dict):
             trade_status = response.get("trade_status", "")
         else:
@@ -64,12 +69,12 @@ class AlipayPaymentBackend(PaymentBackend):
         }
 
     def refund(self, payment, amount) -> dict:
-        # TODO: implement Alipay refund if needed
         return {"status": "not_supported"}
 
     def verify_callback(self, data: dict) -> dict:
-        """Verify Alipay async notification signature and return parsed data."""
-        verified = self._client.verify(data)
+        """Verify Alipay async notification signature."""
+        client = self._get_client()
+        verified = client.verify(data)
         if not verified:
             logger.warning("Alipay callback signature verification failed")
             return {"verified": False}
