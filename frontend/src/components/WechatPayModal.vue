@@ -24,7 +24,7 @@
 
               <div class="wechat-pay-qr">
                 <div class="wechat-pay-qr__frame">
-                  <img src="/images/money.jpg" alt="微信收款码" class="wechat-pay-qr__img" />
+                  <img :src="'/images/money.jpg'" alt="微信收款码" class="wechat-pay-qr__img" />
                 </div>
                 <p class="wechat-pay-qr__tip">请使用微信扫一扫完成支付</p>
               </div>
