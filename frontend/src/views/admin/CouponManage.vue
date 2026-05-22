@@ -152,7 +152,7 @@ onMounted(fetchData)
 
 .primary-btn {
   border: none;
-  background: var(--text-primary);
+  background: var(--accent);
   color: var(--white);
 }
 
