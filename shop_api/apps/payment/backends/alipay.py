@@ -1,3 +1,4 @@
+import base64
 import logging
 from django.conf import settings
 from .base import PaymentBackend
@@ -9,15 +10,17 @@ class AlipayPaymentBackend(PaymentBackend):
     """Alipay sandbox payment backend — lazy client init."""
 
     def _get_client(self):
+        from alipay.aop.api.AlipayClientConfig import AlipayClientConfig
         from alipay.aop.api.DefaultAlipayClient import DefaultAlipayClient
+
         cfg = settings.ALIPAY
-        return DefaultAlipayClient(
-            app_id=cfg["APPID"],
-            app_private_key_string=cfg["APP_PRIVATE_KEY"],
-            alipay_public_key_string=cfg["ALIPAY_PUBLIC_KEY"],
-            sign_type="RSA2",
-            gateway_url=cfg.get("GATEWAY", "https://openapi-sandbox.dl.alipaydev.com/gateway.do"),
-        )
+        alipay_client_config = AlipayClientConfig()
+        alipay_client_config.server_url = cfg["GATEWAY"]
+        alipay_client_config.app_id = cfg["APPID"]
+        alipay_client_config.app_private_key = cfg["APP_PRIVATE_KEY"]
+        alipay_client_config.alipay_public_key = cfg["ALIPAY_PUBLIC_KEY"]
+
+        return DefaultAlipayClient(alipay_client_config=alipay_client_config, logger=logger)
 
     def create_payment(self, order, payment_no, amount) -> dict:
         from alipay.aop.api.domain.AlipayTradePagePayModel import AlipayTradePagePayModel
@@ -45,6 +48,7 @@ class AlipayPaymentBackend(PaymentBackend):
     def query_payment(self, payment_no) -> dict:
         from alipay.aop.api.domain.AlipayTradeQueryModel import AlipayTradeQueryModel
         from alipay.aop.api.request.AlipayTradeQueryRequest import AlipayTradeQueryRequest
+        from alipay.aop.api.response.AlipayTradeQueryResponse import AlipayTradeQueryResponse
 
         client = self._get_client()
 
@@ -52,12 +56,10 @@ class AlipayPaymentBackend(PaymentBackend):
         model.out_trade_no = payment_no
 
         request = AlipayTradeQueryRequest(biz_model=model)
-        response = client.page_execute(request, http_method="GET")
 
-        if isinstance(response, dict):
-            trade_status = response.get("trade_status", "")
-        else:
-            trade_status = ""
+        response_content = client.execute(request)
+        response = AlipayTradeQueryResponse()
+        response.parse_response_content(response_content)
 
         status_map = {
             "TRADE_SUCCESS": "success",
@@ -65,16 +67,56 @@ class AlipayPaymentBackend(PaymentBackend):
         }
         return {
             "payment_no": payment_no,
-            "status": status_map.get(trade_status, "pending"),
+            "status": status_map.get(response.trade_status, "pending"),
         }
 
     def refund(self, payment, amount) -> dict:
         return {"status": "not_supported"}
 
     def verify_callback(self, data: dict) -> dict:
-        """Verify Alipay async notification signature."""
-        client = self._get_client()
-        verified = client.verify(data)
+        """Verify Alipay async notification RSA2 signature."""
+        sign = data.get("sign", "")
+        sign_type = data.get("sign_type", "RSA2")
+
+        # Filter out sign and sign_type, sort by key
+        filtered = "&".join(
+            f"{k}={v}" for k, v in sorted(data.items())
+            if v and k not in ("sign", "sign_type")
+        )
+
+        try:
+            from cryptography.hazmat.primitives import hashes, serialization
+            from cryptography.hazmat.primitives.asymmetric import padding, utils
+            from cryptography.hazmat.backends import default_backend
+
+            # Format the public key
+            pub_key_str = settings.ALIPAY["ALIPAY_PUBLIC_KEY"]
+            if not pub_key_str.startswith("-----"):
+                pub_key_str = (
+                    f"-----BEGIN PUBLIC KEY-----\n"
+                    f"{pub_key_str}\n"
+                    f"-----END PUBLIC KEY-----"
+                )
+
+            public_key = serialization.load_pem_public_key(
+                pub_key_str.encode(), backend=default_backend()
+            )
+
+            # Decode the base64 signature
+            signature = base64.b64decode(sign)
+
+            # Verify
+            public_key.verify(
+                signature,
+                filtered.encode("utf-8"),
+                padding.PKCS1v15(),
+                hashes.SHA256(),
+            )
+            verified = True
+        except Exception:
+            logger.exception("Alipay signature verification failed")
+            verified = False
+
         if not verified:
             logger.warning("Alipay callback signature verification failed")
             return {"verified": False}

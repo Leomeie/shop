@@ -10,3 +10,4 @@ python-dotenv>=1.0
 gunicorn>=22.0
 whitenoise>=6.6
 alipay-sdk-python>=3.7.96
+cryptography>=42.0
