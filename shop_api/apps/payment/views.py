@@ -65,7 +65,11 @@ class PaymentCreateView(APIView):
 
         payment_no = generate_payment_no()
         backend = get_backend(method)
-        result = backend.create_payment(order, payment_no, order.pay_amount)
+        try:
+            result = backend.create_payment(order, payment_no, order.pay_amount)
+        except Exception as e:
+            logger.exception("Payment create failed")
+            return error(f"支付创建失败：{e}")
 
         Payment.objects.create(
             order=order,
