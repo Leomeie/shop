@@ -6,6 +6,28 @@ from .base import PaymentBackend
 logger = logging.getLogger(__name__)
 
 
+def _format_pem_key(raw_key: str, key_type: str) -> str:
+    """Ensure a PEM key has proper headers, footers, and line breaks."""
+    raw = raw_key.strip()
+    if raw.startswith("-----"):
+        return raw  # Already formatted
+
+    # Remove any existing newlines/spaces in the base64 content
+    b64 = "".join(raw.split())
+
+    # Wrap at 64 chars per line (PEM standard)
+    lines = [b64[i:i+64] for i in range(0, len(b64), 64)]
+
+    if key_type == "private":
+        header = "-----BEGIN RSA PRIVATE KEY-----"
+        footer = "-----END RSA PRIVATE KEY-----"
+    else:
+        header = "-----BEGIN PUBLIC KEY-----"
+        footer = "-----END PUBLIC KEY-----"
+
+    return "\n".join([header] + lines + [footer])
+
+
 class AlipayPaymentBackend(PaymentBackend):
     """Alipay sandbox payment backend — lazy client init."""
 
@@ -17,8 +39,8 @@ class AlipayPaymentBackend(PaymentBackend):
         alipay_client_config = AlipayClientConfig()
         alipay_client_config.server_url = cfg["GATEWAY"]
         alipay_client_config.app_id = cfg["APPID"]
-        alipay_client_config.app_private_key = cfg["APP_PRIVATE_KEY"]
-        alipay_client_config.alipay_public_key = cfg["ALIPAY_PUBLIC_KEY"]
+        alipay_client_config.app_private_key = _format_pem_key(cfg["APP_PRIVATE_KEY"], "private")
+        alipay_client_config.alipay_public_key = _format_pem_key(cfg["ALIPAY_PUBLIC_KEY"], "public")
 
         return DefaultAlipayClient(alipay_client_config=alipay_client_config, logger=logger)
 
@@ -86,17 +108,10 @@ class AlipayPaymentBackend(PaymentBackend):
 
         try:
             from cryptography.hazmat.primitives import hashes, serialization
-            from cryptography.hazmat.primitives.asymmetric import padding, utils
             from cryptography.hazmat.backends import default_backend
 
             # Format the public key
-            pub_key_str = settings.ALIPAY["ALIPAY_PUBLIC_KEY"]
-            if not pub_key_str.startswith("-----"):
-                pub_key_str = (
-                    f"-----BEGIN PUBLIC KEY-----\n"
-                    f"{pub_key_str}\n"
-                    f"-----END PUBLIC KEY-----"
-                )
+            pub_key_str = _format_pem_key(settings.ALIPAY["ALIPAY_PUBLIC_KEY"], "public")
 
             public_key = serialization.load_pem_public_key(
                 pub_key_str.encode(), backend=default_backend()
