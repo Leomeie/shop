@@ -166,7 +166,7 @@ onMounted(async () => {
 .bar-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--text-primary) 100%);
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
 }
 
 .trend-orders,

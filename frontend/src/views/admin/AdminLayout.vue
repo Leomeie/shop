@@ -132,7 +132,7 @@ const activeMenuName = computed(() => {
 }
 
 .brand-subtitle {
-  color: rgba(255, 255, 255, 0.48);
+  color: rgba(255, 255, 255, 0.6);
   font-size: var(--text-xs);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -150,7 +150,7 @@ const activeMenuName = computed(() => {
   gap: var(--sp-3);
   padding: var(--sp-3) var(--sp-4);
   border-radius: 14px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: 500;
@@ -176,7 +176,7 @@ const activeMenuName = computed(() => {
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.65);
   font-family: var(--font-display);
   font-size: var(--text-sm);
 }

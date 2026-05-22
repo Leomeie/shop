@@ -26,7 +26,7 @@
   /* Text colors */
   --text-primary:    #f1f5f9;
   --text-secondary:  #cbd5e1;
-  --text-muted:      #64748b;
+  --text-muted:      #8896a8;
   --text-faint:      #94a3b8;
 
   /* Semantic */
@@ -266,7 +266,7 @@ input, textarea { font-family: inherit; }
   display: inline-flex; align-items: center; gap: var(--sp-2);
   font-family: var(--font-display); font-size: 11px; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.45); margin-bottom: var(--sp-3);
+  color: rgba(255,255,255,0.6); margin-bottom: var(--sp-3);
 }
 .page-hero .hero-title {
   font-family: var(--font-display); font-weight: 700;
@@ -279,7 +279,7 @@ input, textarea { font-family: inherit; }
   -webkit-text-fill-color: transparent;
 }
 .page-hero .hero-subtitle {
-  font-size: var(--text-sm); color: rgba(255,255,255,0.5);
+  font-size: var(--text-sm); color: rgba(255,255,255,0.65);
   display: flex; align-items: center; gap: var(--sp-2);
 }
 
@@ -870,7 +870,7 @@ input, textarea { font-family: inherit; }
 .admin-shell .table-toolbar-search input {
   color: #e2e8f0;
 }
-.admin-shell .table-toolbar-search input::placeholder { color: #64748b; }
+.admin-shell .table-toolbar-search input::placeholder { color: #8896a8; }
 .admin-shell .field input,
 .admin-shell .field select,
 .admin-shell .field textarea {

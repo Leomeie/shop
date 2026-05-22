@@ -741,7 +741,7 @@ onUnmounted(() => {
 }
 
 .showcase-card-label {
-  color: rgba(255, 255, 255, 0.52);
+  color: rgba(255, 255, 255, 0.65);
   font-family: var(--font-display);
   font-size: var(--text-xs);
   font-weight: 700;

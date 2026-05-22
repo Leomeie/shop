@@ -173,7 +173,7 @@ onUnmounted(() => {
 }
 
 .wechat-pay-amount__label {
-  color: #999;
+  color: #777;
   font-size: 13px;
 }
 
@@ -208,7 +208,7 @@ onUnmounted(() => {
 }
 
 .wechat-pay-qr__tip {
-  color: #999;
+  color: #777;
   font-size: 13px;
 }
 
@@ -220,7 +220,7 @@ onUnmounted(() => {
   padding: 8px 16px;
   border-radius: 20px;
   background: #f6f6f6;
-  color: #666;
+  color: #555;
   font-size: 13px;
 }
 
@@ -261,7 +261,7 @@ onUnmounted(() => {
 
 .wechat-pay-footer-tip {
   margin-top: 16px;
-  color: #bbb;
+  color: #888;
   font-size: 12px;
 }
 

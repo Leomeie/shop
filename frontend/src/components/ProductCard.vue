@@ -117,7 +117,7 @@ onUnmounted(() => {
 }
 .card-img-placeholder {
   width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-  color: var(--text-muted); opacity: 0.4;
+  color: var(--text-secondary); opacity: 0.5;
 }
 .card:hover .card-img-wrap img { transform: scale(1.06); }
 
