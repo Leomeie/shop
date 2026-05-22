@@ -6,6 +6,7 @@ class Payment(models.Model):
     """支付记录，关联订单，记录支付方式、流水号和状态。"""
     METHOD_CHOICES = [
         ("mock", "模拟支付"),
+        ("alipay", "支付宝"),
         ("stripe", "Stripe"),
     ]
     STATUS_CHOICES = [

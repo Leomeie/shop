@@ -141,6 +141,16 @@ CACHES = {
 # Order settings
 ORDER_UNPAID_TIMEOUT = 30 * 60  # 30 minutes
 
+# Alipay sandbox
+ALIPAY = {
+    "APPID": os.environ.get("ALIPAY_APPID", "9021000163699686"),
+    "APP_PRIVATE_KEY": os.environ.get("ALIPAY_PRIVATE_KEY", ""),
+    "ALIPAY_PUBLIC_KEY": os.environ.get("ALIPAY_PUBLIC_KEY", ""),
+    "GATEWAY": os.environ.get("ALIPAY_GATEWAY", "https://openapi-sandbox.dl.alipaydev.com/gateway.do"),
+    "NOTIFY_URL": os.environ.get("ALIPAY_NOTIFY_URL", ""),
+    "RETURN_URL": os.environ.get("ALIPAY_RETURN_URL", ""),
+}
+
 # Upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
 ALLOWED_UPLOAD_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"]

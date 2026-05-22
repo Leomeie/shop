@@ -107,12 +107,6 @@
       </div>
     </div>
 
-    <WechatPayModal
-      :visible="showPayModal"
-      :amount="order?.pay_amount_yuan"
-      @close="showPayModal = false"
-      @confirmed="handlePayConfirm"
-    />
   </div>
 </template>
 
@@ -122,9 +116,8 @@ import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import StorePageHeader from '../../components/StorePageHeader.vue'
-import WechatPayModal from '../../components/WechatPayModal.vue'
 import { cancelOrder, getOrder } from '../../api/order'
-import { createPayment, paymentCallback } from '../../api/payment'
+import { createPayment } from '../../api/payment'
 
 const route = useRoute()
 const order = ref(null)
@@ -152,14 +145,17 @@ onMounted(async () => {
 
 async function handlePayConfirm() {
   try {
-    const payRes = await createPayment({ order_id: order.value.id, method: 'mock' })
-    await paymentCallback({ payment_no: payRes.data.payment_no })
+    const payRes = await createPayment({ order_id: order.value.id, method: 'alipay' })
     showPayModal.value = false
-    ElMessage.success('支付成功')
-    await refreshOrder()
-  } catch (error) {
+    const payUrl = payRes.data.pay_url
+    if (payUrl) {
+      window.location.href = payUrl
+    } else {
+      ElMessage.error('获取支付链接失败')
+    }
+  } catch (err) {
     showPayModal.value = false
-    ElMessage.error(error.message || '支付失败')
+    ElMessage.error(err.message || '支付失败')
   }
 }
 
