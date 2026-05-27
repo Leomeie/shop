@@ -11,8 +11,8 @@
       <div class="card-shine" />
     </div>
     <div class="card-body">
-      <p v-if="product.category_name" class="card-cat">{{ product.category_name }}</p>
-      <h3 class="card-title">{{ product.name }}</h3>
+      <p v-if="product.category_name" class="card-cat" v-html="highlightText(product.category_name)" />
+      <h3 class="card-title" v-html="highlightText(product.name)" />
       <div class="card-footer">
         <span class="card-price">¥{{ product.min_price_yuan }}</span>
         <span class="card-meta">
@@ -28,7 +28,16 @@
 import { ref, onUnmounted } from 'vue'
 import { gsap } from '../composables/useGsap'
 
-defineProps({ product: { type: Object, required: true } })
+const props = defineProps({
+  product: { type: Object, required: true },
+  keyword: { type: String, default: '' },
+})
+
+function highlightText(text) {
+  if (!props.keyword || !text) return text
+  const escaped = props.keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return text.replace(new RegExp(`(${escaped})`, 'gi'), '<mark class="search-hl">$1</mark>')
+}
 
 const cardRef = ref(null)
 let quickRotateX = null
@@ -166,4 +175,11 @@ onUnmounted(() => {
   transition: color var(--dur-fast);
 }
 .card:hover .card-meta { color: var(--text-secondary); }
+
+:deep(.search-hl) {
+  background: rgba(59, 130, 246, 0.2);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
 </style>
