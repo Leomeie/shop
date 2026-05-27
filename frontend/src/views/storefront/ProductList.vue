@@ -102,16 +102,20 @@
 
             <div v-if="loading && !products.length" class="product-grid">
               <div v-for="i in 8" :key="i" class="skeleton-card">
-                <div class="skeleton skeleton-img" />
-                <div class="skeleton-body">
-                  <div class="skeleton skeleton-cat" />
-                  <div class="skeleton skeleton-title" />
-                  <div class="skeleton skeleton-title short" />
-                  <div class="skeleton-footer">
-                    <div class="skeleton skeleton-price" />
-                    <div class="skeleton skeleton-meta" />
-                  </div>
-                </div>
+                <el-skeleton :animated="true">
+                  <template #template>
+                    <el-skeleton-item variant="image" class="skeleton-img" />
+                    <div style="padding: var(--sp-4) var(--sp-5) var(--sp-5)">
+                      <el-skeleton-item variant="text" style="width: 60px; height: 12px; margin-bottom: var(--sp-3)" />
+                      <el-skeleton-item variant="text" style="width: 100%; height: 16px; margin-bottom: var(--sp-2)" />
+                      <el-skeleton-item variant="text" style="width: 72%; height: 16px; margin-bottom: var(--sp-4)" />
+                      <div style="display: flex; justify-content: space-between; align-items: center">
+                        <el-skeleton-item variant="text" style="width: 60px; height: 20px" />
+                        <el-skeleton-item variant="text" style="width: 44px; height: 14px" />
+                      </div>
+                    </div>
+                  </template>
+                </el-skeleton>
               </div>
             </div>
 
@@ -330,43 +334,7 @@ watch(
 
 .skeleton-img {
   aspect-ratio: 4 / 3;
-}
-
-.skeleton-body {
-  padding: var(--sp-4) var(--sp-5) var(--sp-5);
-}
-
-.skeleton-cat {
-  height: 12px;
-  width: 60px;
-  margin-bottom: var(--sp-3);
-}
-
-.skeleton-title {
-  height: 16px;
   width: 100%;
-  margin-bottom: var(--sp-2);
-}
-
-.skeleton-title.short {
-  width: 72%;
-  margin-bottom: var(--sp-4);
-}
-
-.skeleton-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.skeleton-price {
-  height: 20px;
-  width: 60px;
-}
-
-.skeleton-meta {
-  height: 14px;
-  width: 44px;
 }
 
 .pagination {

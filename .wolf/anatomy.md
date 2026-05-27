@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T09:20:38.577Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T09:29:49.789Z
 > Files: 270 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -10,10 +10,10 @@
 - `.mcp.json` (~126 tok)
 - `CLAUDE.md` — OpenWolf (~742 tok)
 - `docker-compose.yml` — Docker Compose services (~264 tok)
-- `prd.json` (~3105 tok)
+- `prd.json` (~3104 tok)
 - `PRD.md` — 产品需求文档 (PRD) (~4017 tok)
 - `Procfile` (~27 tok)
-- `progress.txt` — Ralph Progress Log (~8509 tok)
+- `progress.txt` — Ralph Progress Log (~8882 tok)
 - `README.md` — Project documentation (~6921 tok)
 - `render.yaml` (~213 tok)
 
@@ -63,7 +63,7 @@
 
 - `App.vue` — Vue component (~11 tok)
 - `env.d.ts` — / <reference types="vite/client" /> (~54 tok)
-- `main.js` — Declares app (~191 tok)
+- `main.js` — Declares app (~224 tok)
 
 ## frontend/src/api/
 
@@ -146,7 +146,7 @@
 - `OrderDetail.vue` — Vue: setup (~2212 tok)
 - `Orders.vue` — Vue: setup (~2064 tok)
 - `ProductDetail.vue` — Vue: setup (~3640 tok)
-- `ProductList.vue` — Vue: setup (~3223 tok)
+- `ProductList.vue` — Vue: setup (~3232 tok)
 - `Profile.vue` — Vue: setup (~1204 tok)
 - `Register.vue` — Vue: setup (~2907 tok)
 - `Showcase.vue` — Vue: setup (~727 tok)

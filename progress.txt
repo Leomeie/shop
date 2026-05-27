@@ -451,3 +451,22 @@
   - Template ref on `router-link` gives component instance, not DOM element — use a wrapper div for direct DOM ref access
   - `watch(cartStore.count, (new, old) => ...)` naturally receives old/new values, no need for separate `prevCount` tracking
 ---
+
+## 2026-05-27 25:00 - US-025
+- What was implemented: 商品卡片骨架屏 — Element Plus el-skeleton with shimmer animation
+- Files changed:
+  - `frontend/src/main.js` — added el-skeleton and el-skeleton-item CSS imports
+  - `frontend/src/views/storefront/ProductList.vue` — replaced custom skeleton divs with `el-skeleton` + `el-skeleton-item` components
+- Features:
+  - 8 skeleton cards shown during initial load (before products arrive)
+  - `el-skeleton` with `animated` prop provides built-in shimmer effect
+  - Skeleton items use `variant="image"` for the card image area and `variant="text"` for text lines
+  - Layout matches real ProductCard structure (image, category, title, price, download count)
+  - Removed old custom `.skeleton-*` CSS classes (no longer needed)
+  - `prefers-reduced-motion` already handled by global.css and Element Plus
+- **Learnings for future iterations:**
+  - `el-skeleton` must be registered or imported with its CSS (`element-plus/es/components/skeleton/style/css`) — Element Plus tree-shakes styles
+  - Element Plus `el-skeleton-item` `variant` prop: "image" (16:9 ratio block), "text" (line), "circle", "rect", "button" — "image" matches product card aspect ratio
+  - The old custom skeleton used `.skeleton` class from global.css which already had shimmer animation — `el-skeleton` provides the same effect out of the box
+  - Skeleton shows only on initial load (`loading && !products.length`) — subsequent page/sort changes show existing products while fetching
+---
