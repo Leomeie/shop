@@ -46,7 +46,11 @@
       </header>
 
       <main class="admin-main">
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <PageTransition>
+            <component :is="Component" />
+          </PageTransition>
+        </router-view>
       </main>
     </div>
   </div>
@@ -56,6 +60,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '../../stores/user'
+import PageTransition from '../../components/PageTransition.vue'
 
 const route = useRoute()
 const userStore = useUserStore()

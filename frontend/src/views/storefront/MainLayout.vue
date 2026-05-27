@@ -107,9 +107,9 @@
 
     <main :class="['main', { 'main-home': isHome }]">
       <router-view v-slot="{ Component }">
-        <Transition mode="out-in" :css="false" @leave="onLeave" @enter="onEnter">
+        <PageTransition>
           <component :is="Component" />
-        </Transition>
+        </PageTransition>
       </router-view>
     </main>
 
@@ -140,11 +140,12 @@ import { useUserStore } from '../../stores/user'
 import { useCartStore } from '../../stores/cart'
 import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import GradientText from '../../components/GradientText.vue'
+import PageTransition from '../../components/PageTransition.vue'
 import { usePageTransition } from '../../composables/usePageTransition'
 
 const router = useRouter()
 const route = useRoute()
-const { onLeave, onEnter, scrollToTop } = usePageTransition()
+const { scrollToTop } = usePageTransition()
 const userStore = useUserStore()
 const cartStore = useCartStore()
 
