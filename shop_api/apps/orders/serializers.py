@@ -7,6 +7,7 @@ from common.utils import generate_order_no
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    """订单商品序列化器。"""
     price_yuan = serializers.SerializerMethodField()
 
     class Meta:
@@ -19,6 +20,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderListSerializer(serializers.ModelSerializer):
+    """订单列表序列化器。"""
     items = OrderItemSerializer(many=True, read_only=True)
     pay_amount_yuan = serializers.SerializerMethodField()
     status_display = serializers.CharField(source="get_status_display", read_only=True)
@@ -33,6 +35,7 @@ class OrderListSerializer(serializers.ModelSerializer):
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
+    """订单详情序列化器。"""
     items = OrderItemSerializer(many=True, read_only=True)
     total_amount_yuan = serializers.SerializerMethodField()
     discount_amount_yuan = serializers.SerializerMethodField()
@@ -58,7 +61,8 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 
 
 class OrderCreateSerializer(serializers.Serializer):
-    remark = serializers.CharField(max_length=200, required=False, default="")
+    """创建订单（从购物车选中商品下单）。"""
+    remark = serializers.CharField(max_length=200, required=False, default="", help_text="订单备注")
 
     def create(self, validated_data):
         user = self.context["request"].user

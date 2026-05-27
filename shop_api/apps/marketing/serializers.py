@@ -4,6 +4,7 @@ from .models import Coupon, UserCoupon
 
 
 class CouponSerializer(serializers.ModelSerializer):
+    """优惠券序列化器。"""
     value_yuan = serializers.SerializerMethodField()
     min_amount_yuan = serializers.SerializerMethodField()
     type_display = serializers.CharField(source="get_type_display", read_only=True)
@@ -24,6 +25,7 @@ class CouponSerializer(serializers.ModelSerializer):
 
 
 class UserCouponSerializer(serializers.ModelSerializer):
+    """用户已领取的优惠券序列化器。"""
     coupon = CouponSerializer(read_only=True)
 
     class Meta:
@@ -32,7 +34,8 @@ class UserCouponSerializer(serializers.ModelSerializer):
 
 
 class CouponClaimSerializer(serializers.Serializer):
-    coupon_id = serializers.IntegerField()
+    """领取优惠券。"""
+    coupon_id = serializers.IntegerField(help_text="优惠券 ID")
 
     def validate_coupon_id(self, value):
         now = timezone.now()
