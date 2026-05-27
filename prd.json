@@ -161,7 +161,7 @@
         "不需要认证"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": "prd-security-ops.md"
     },
     {
