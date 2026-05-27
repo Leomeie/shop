@@ -224,7 +224,7 @@
         "Verify in browser"
       ],
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "dependsOn": ["US-013"],
       "notes": "prd-features-v2.md"
     },
