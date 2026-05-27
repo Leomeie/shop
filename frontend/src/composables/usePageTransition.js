@@ -1,7 +1,13 @@
-import { gsap, ScrollToPlugin, ScrollTrigger } from './useGsap.js'
+import { gsap, ScrollToPlugin, ScrollTrigger, useReducedMotion } from './useGsap.js'
 
 export function usePageTransition() {
+  const reducedMotion = useReducedMotion()
+
   function onLeave(el, done) {
+    if (reducedMotion.value) {
+      done()
+      return
+    }
     gsap.to(el, {
       opacity: 0,
       y: -8,
@@ -12,6 +18,10 @@ export function usePageTransition() {
   }
 
   function onEnter(el, done) {
+    if (reducedMotion.value) {
+      done()
+      return
+    }
     gsap.fromTo(el,
       { opacity: 0, y: 16 },
       {
