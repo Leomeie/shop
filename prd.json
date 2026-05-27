@@ -314,7 +314,7 @@
         "README 中有环境配置说明"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": "prd-engineering.md"
     },
     {

@@ -192,6 +192,87 @@ shop/
 
 ---
 
+## 环境配置
+
+### 快速开始
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/your-username/shop.git
+cd shop
+
+# 2. 后端环境配置
+cd shop_api
+cp .env.example .env
+# 编辑 .env 填入你的配置
+
+# 3. 安装后端依赖
+pip install -r requirements.txt
+
+# 4. 数据库迁移
+python manage.py migrate
+
+# 5. 启动后端
+python manage.py runserver
+
+# 6. 前端环境配置（新终端）
+cd frontend
+cp .env.example .env
+# 编辑 .env 填入你的配置
+
+# 7. 安装前端依赖
+npm install
+
+# 8. 启动前端
+npm run dev
+```
+
+### 环境变量说明
+
+#### 后端环境变量 (`shop_api/.env`)
+
+| 变量 | 必填 | 默认值 | 说明 |
+|------|------|--------|------|
+| `DJANGO_SETTINGS_MODULE` | 否 | `config.settings.development` | Django 配置模块 |
+| `DJANGO_SECRET_KEY` | 生产必填 | 内置开发密钥 | Django 密钥 |
+| `ALLOWED_HOSTS` | 否 | `*` | 允许的主机名（逗号分隔） |
+| `DB_NAME` | 开发用 | `shop` | MySQL 数据库名 |
+| `DB_USER` | 开发用 | `root` | MySQL 用户名 |
+| `DB_PASSWORD` | 开发用 | `123456` | MySQL 密码 |
+| `DB_HOST` | 开发用 | `127.0.0.1` | MySQL 主机 |
+| `DB_PORT` | 开发用 | `3306` | MySQL 端口 |
+| `DATABASE_URL` | 生产必填 | - | PostgreSQL 连接 URL |
+| `CORS_ALLOWED_ORIGINS` | 生产必填 | - | 允许的前端域名（逗号分隔） |
+| `ALIPAY_APPID` | 否 | 沙箱默认值 | 支付宝 AppID |
+| `ALIPAY_PRIVATE_KEY` | 否 | - | 支付宝私钥 |
+| `ALIPAY_PUBLIC_KEY` | 否 | - | 支付宝公钥 |
+| `ALIPAY_NOTIFY_URL` | 否 | - | 支付宝回调地址 |
+| `ALIPAY_RETURN_URL` | 否 | - | 支付宝同步回调地址 |
+
+#### 前端环境变量 (`frontend/.env`)
+
+| 变量 | 必填 | 默认值 | 说明 |
+|------|------|--------|------|
+| `VITE_API_BASE` | 生产必填 | `/api/v1` | 后端 API 地址 |
+| `VITE_PROXY_TARGET` | 否 | `http://127.0.0.1:8000` | 开发代理目标 |
+
+### 环境配置文件
+
+项目使用 `.env` 文件管理环境变量：
+
+```
+shop/
+├── shop_api/.env.example    # 后端环境变量模板
+├── shop_api/.env            # 后端实际配置（不提交）
+├── frontend/.env.example    # 前端环境变量模板
+├── frontend/.env            # 前端实际配置（不提交）
+└── .gitignore               # 已排除 .env 文件
+```
+
+**注意：** `.env` 文件包含敏感信息，已在 `.gitignore` 中排除，不要提交到版本控制。
+
+---
+
 ## 系统架构
 
 ```
