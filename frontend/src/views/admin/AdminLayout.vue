@@ -37,6 +37,10 @@
         </div>
 
         <div class="admin-topbar__user">
+          <button class="admin-theme-btn" type="button" :title="theme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'" @click="toggleTheme">
+            <span v-if="theme === 'dark'">&#9790;</span>
+            <span v-else>&#9728;</span>
+          </button>
           <div class="user-avatar">{{ (userStore.userInfo?.username || 'A').charAt(0).toUpperCase() }}</div>
           <div>
             <div class="user-name">{{ userStore.userInfo?.username }}</div>
@@ -61,6 +65,9 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '../../stores/user'
 import PageTransition from '../../components/PageTransition.vue'
+import { useTheme } from '../../composables/useTheme'
+
+const { theme, toggle: toggleTheme } = useTheme()
 
 const route = useRoute()
 const userStore = useUserStore()
@@ -225,6 +232,26 @@ const activeMenuName = computed(() => {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
+}
+
+.admin-theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.5);
+  color: #94a3b8;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast);
+}
+.admin-theme-btn:hover {
+  color: #e2e8f0;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .user-avatar {

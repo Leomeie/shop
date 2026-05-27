@@ -26,6 +26,10 @@
           <button class="nav-btn" type="button" @click="searchOpen = !searchOpen">
             <AnimatedIcons name="search" :size="18" />
           </button>
+          <button class="nav-btn theme-toggle" type="button" :title="theme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'" @click="toggleTheme">
+            <span v-if="theme === 'dark'" class="theme-icon">&#9790;</span>
+            <span v-else class="theme-icon">&#9728;</span>
+          </button>
           <router-link to="/showcase" class="nav-link">
             <AnimatedIcons name="star" :size="18" />
             <span>商品</span>
@@ -145,6 +149,7 @@ import GradientText from '../../components/GradientText.vue'
 import PageTransition from '../../components/PageTransition.vue'
 import { usePageTransition } from '../../composables/usePageTransition'
 import { useMicroInteraction } from '../../composables/useMicroInteraction'
+import { useTheme } from '../../composables/useTheme'
 
 const router = useRouter()
 const route = useRoute()
@@ -152,6 +157,7 @@ const { scrollToTop } = usePageTransition()
 const userStore = useUserStore()
 const cartStore = useCartStore()
 const { bounceBadge, pulseButton } = useMicroInteraction()
+const { theme, toggle: toggleTheme } = useTheme()
 
 const cartBtnRef = ref(null)
 const cartBadgeRef = ref(null)
@@ -371,6 +377,11 @@ onUnmounted(() => {
   transform: scale(1.05);
   background: rgba(59, 130, 246, 0.1);
   color: var(--text-primary);
+}
+
+.theme-toggle .theme-icon {
+  font-size: 18px;
+  line-height: 1;
 }
 
 .cart-btn-wrap {

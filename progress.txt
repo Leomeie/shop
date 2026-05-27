@@ -470,3 +470,28 @@
   - The old custom skeleton used `.skeleton` class from global.css which already had shimmer animation — `el-skeleton` provides the same effect out of the box
   - Skeleton shows only on initial load (`loading && !products.length`) — subsequent page/sort changes show existing products while fetching
 ---
+
+## 2026-05-27 25:30 - US-026
+- What was implemented: 暗色模式基础支持 — CSS variables theme switching with localStorage persistence and system preference follow
+- Files changed:
+  - `frontend/src/styles/global.css` — added `[data-theme="light"]` CSS variable overrides (~120 new rules covering all surfaces, admin shell, Element Plus)
+  - `frontend/src/composables/useTheme.js` (created) — theme state composable with localStorage persistence, system preference detection, and toggle
+  - `frontend/src/views/storefront/MainLayout.vue` — added theme toggle button (moon/sun icon) in nav bar
+  - `frontend/src/views/admin/AdminLayout.vue` — added theme toggle button in admin topbar
+  - `frontend/index.html` — added inline script to set `data-theme` before paint (prevents flash)
+- Features:
+  - Dark theme is the default (matches existing design)
+  - Light theme overrides all CSS variables: backgrounds, text colors, borders, shadows, glass morphism
+  - Theme toggle button shows moon (🌙) in dark mode, sun (☀️) in light mode
+  - Preference saved to localStorage under key `shopease-theme`
+  - Follows system `prefers-color-scheme` when no saved preference
+  - Listens for system preference changes in real-time
+  - Inline script in index.html sets theme before first paint (no flash)
+  - Admin panel also has theme toggle and full light theme support
+- **Learnings for future iterations:**
+  - The app was already dark-themed, so "dark mode support" meant adding a light theme variant via `[data-theme="light"]` overrides
+  - Inline `<script>` in index.html before module scripts is the only way to prevent flash of wrong theme (FOUC)
+  - `useTheme` composable uses module-level `theme` ref as singleton — multiple callers share the same reactive state
+  - Admin layout uses scoped styles with hardcoded colors — light theme overrides need `!important`-free selectors via `[data-theme="light"] .admin-shell` specificity
+  - Element Plus components inherit CSS custom properties — overriding `--el-*` vars in theme block handles most Element Plus styling
+---

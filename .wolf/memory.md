@@ -486,3 +486,24 @@
 | 17:26 | Session end: 3 writes across 2 files (main.js, ProductList.vue) | 6 reads | ~26716 tok |
 | 17:29 | Edited prd.json | 12→12 lines | ~92 |
 | 17:29 | Edited progress.txt | expanded (+19 lines) | ~433 |
+| 17:32 | Session end: 5 writes across 4 files (main.js, ProductList.vue, prd.json, progress.txt) | 6 reads | ~27272 tok |
+
+## Session: 2026-05-27 17:32
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 17:34 | Edited frontend/src/styles/global.css | expanded (+118 lines) | ~1859 |
+| 17:34 | Created frontend/src/composables/useTheme.js | — | ~361 |
+| 17:34 | Edited frontend/src/views/storefront/MainLayout.vue | added 1 import(s) | ~35 |
+| 17:35 | Edited frontend/src/views/storefront/MainLayout.vue | CSS: toggle | ~29 |
+| 17:35 | Edited frontend/src/views/storefront/MainLayout.vue | 3→7 lines | ~119 |
+| 17:36 | Edited frontend/src/views/storefront/MainLayout.vue | CSS: font-size, line-height | ~49 |
+| 17:36 | Edited frontend/index.html | added 1 condition(s) | ~101 |
+| 17:37 | Session end: 7 writes across 4 files (global.css, useTheme.js, MainLayout.vue, index.html) | 8 reads | ~29057 tok |
+| 17:38 | Edited frontend/src/views/admin/AdminLayout.vue | CSS: toggle | ~59 |
+| 17:38 | Edited frontend/src/views/admin/AdminLayout.vue | 2→6 lines | ~106 |
+| 17:38 | Edited frontend/src/views/admin/AdminLayout.vue | expanded (+20 lines) | ~157 |
+| 17:39 | Edited frontend/src/styles/global.css | expanded (+45 lines) | ~490 |
+| 17:40 | Edited prd.json | 14→14 lines | ~101 |
+| 17:41 | Edited progress.txt | expanded (+25 lines) | ~587 |
+| 25:30 | US-026 dark mode: global.css, useTheme.js, MainLayout, AdminLayout, index.html | light theme CSS vars + toggle + localStorage + system pref | ~2200 |
