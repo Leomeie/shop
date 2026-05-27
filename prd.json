@@ -115,7 +115,7 @@
         "所有测试通过"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": "prd-security-ops.md"
     },
     {
