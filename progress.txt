@@ -148,3 +148,38 @@
   - Custom exception handler (`common/exceptions.py`) wraps all responses including 429 in `{"code": N, "message": "...", "errors": ...}` format — assertions must check `resp.data["message"]` not `resp.data["detail"]`.
   - `cache.clear()` alone doesn't reset DRF throttle class-level rate caches — need to explicitly set `cls.rate = None` on each throttle class.
 ---
+
+## 2026-05-27 20:30 - US-008
+- What was implemented: API 文档自动生成 (drf-spectacular OpenAPI 3.0)
+- Files changed:
+  - `shop_api/requirements.txt` — added drf-spectacular>=0.27
+  - `shop_api/config/urls.py` — conditionally added /api/schema/ and /api/docs/ endpoints
+  - `shop_api/apps/users/serializers.py` — added help_text and docstrings to RegisterSerializer, LoginSerializer
+  - `shop_api/apps/cart/serializers.py` — added help_text and docstrings to all cart serializers
+  - `shop_api/apps/orders/serializers.py` — added help_text and docstrings to order serializers
+  - `shop_api/apps/marketing/serializers.py` — added help_text and docstrings to coupon serializers
+  - `shop_api/apps/products/serializers.py` — added docstrings to product/category/SKU serializers
+  - `shop_api/tests/test_spectacular.py` (created) — 6 tests (skipped without package)
+  - `shop_api/setup_spectacular.py` (created) — helper script to enable drf-spectacular settings
+- **Setup required:** User must run `pip install drf-spectacular` then `python setup_spectacular.py`
+- **Learnings for future iterations:**
+  - Can't add a package to INSTALLED_APPS without it being installed — Django fails at import time. Use conditional URL patterns (`try/except ImportError`) and skip test markers for optional dependencies.
+  - drf-spectacular reads serializer docstrings for descriptions and `help_text` for field-level docs in the OpenAPI schema.
+  - Created `setup_spectacular.py` to automate settings changes after package installation — avoids manual editing of base.py.
+---
+
+## 2026-05-27 21:00 - US-009
+- What was implemented: 结构化日志体系
+- Files changed:
+  - `shop_api/config/logging.py` (created) — structured logging config with JsonFormatter and ColorFormatter
+  - `shop_api/config/settings/base.py` — replaced inline LOGGING with import from config.logging
+- Features:
+  - Production: JSON format logs (timestamp, level, logger, module, message) for ELK parsing
+  - Development: Colorful console output with ANSI colors
+  - Payment module gets dedicated logger with both file + console handlers at INFO level
+  - Rotating file handler for all logs (5MB max, 5 backups)
+- **Learnings for future iterations:**
+  - Avoid `pythonjsonlogger` dependency — custom JsonFormatter using stdlib `json` is sufficient and avoids an extra package
+  - `IS_PRODUCTION` detection via `DJANGO_SETTINGS_MODULE` suffix works well for switching log formats
+  - Payment logger (`apps.payment`) needs `propagate: False` to avoid duplicate entries in root handler
+---

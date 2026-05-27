@@ -112,6 +112,15 @@ REST_FRAMEWORK = {
     ),
     "EXCEPTION_HANDLER": "common.exceptions.custom_exception_handler",
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "20/min",
+        "user": "60/min",
+        "payment": "10/min",
+    },
 }
 
 # JWT
@@ -156,30 +165,4 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
 ALLOWED_UPLOAD_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"]
 
 # Logging
-LOG_DIR = BASE_DIR / "logs"
-LOG_DIR.mkdir(exist_ok=True)
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {message}",
-            "style": "{",
-        },
-    },
-    "handlers": {
-        "file": {
-            "level": "WARNING",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOG_DIR / "django.log",
-            "maxBytes": 1024 * 1024 * 5,
-            "backupCount": 5,
-            "formatter": "verbose",
-        },
-    },
-    "root": {
-        "handlers": ["file"],
-        "level": "WARNING",
-    },
-}
+from config.logging import LOGGING  # noqa: E402, F401
