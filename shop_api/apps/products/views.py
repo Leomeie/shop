@@ -1,4 +1,6 @@
 from rest_framework import generics, permissions, filters
+from django.core.cache import cache
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Category, Product, ProductImage, SKU
 from .serializers import (
@@ -55,8 +57,29 @@ class ProductDetailView(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        Product.objects.filter(pk=instance.pk).update(view_count=instance.view_count + 1)
+        ip = request.META.get("HTTP_X_FORWARDED_FOR", request.META.get("REMOTE_ADDR", "")).split(",")[0].strip()
+        cache_key = f"product_view:{instance.pk}:{ip}"
+        if not cache.get(cache_key):
+            Product.objects.filter(pk=instance.pk).update(view_count=instance.view_count + 1)
+            cache.set(cache_key, True, 86400)
         return super().retrieve(request, *args, **kwargs)
+
+
+class ProductSearchView(generics.ListAPIView):
+    """Search products by keyword across name, description, and category name."""
+    serializer_class = ProductListSerializer
+    permission_classes = [permissions.AllowAny]
+    pagination_class = StandardPagination
+
+    def get_queryset(self):
+        q = self.request.query_params.get("q", "").strip()
+        if not q:
+            return Product.objects.none()
+        return Product.objects.filter(
+            Q(name__icontains=q) | Q(description__icontains=q) | Q(category__name__icontains=q),
+            status="active",
+            is_deleted=False,
+        ).select_related("category").distinct()
 
 
 # ── Admin views ──

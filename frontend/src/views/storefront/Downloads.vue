@@ -73,9 +73,7 @@ async function handleDownload(orderId, itemId) {
   try {
     const res = await getDownloadToken(orderId, itemId)
     ElMessage.success(`下载令牌：${res.data.download_token}`)
-  } catch (error) {
-    ElMessage.error(error.message || '下载失败')
-  }
+  } catch {}
 }
 </script>
 

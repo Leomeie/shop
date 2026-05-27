@@ -1,0 +1,497 @@
+# Ralph Progress Log
+# Auto-appended by each iteration
+
+## Codebase Patterns
+- Backend uses Django REST Framework with JWT auth (simplejwt)
+- MySQL in dev, SQLite for tests
+- Custom User model (AbstractUser) with phone, nickname, avatar
+- Product has SKU model for pricing tiers (price in 分/cents)
+- Settings split: base.py / development.py / production.py
+- All apps live under shop_api/apps/
+- Common utilities in shop_api/common/ (pagination, permissions, response, exceptions)
+- Frontend: Vue 3 + Vite + Element Plus + Pinia
+- Frontend TypeScript: use .d.ts files alongside .js modules for gradual migration; `moduleResolution: "bundler"` in tsconfig.json
+
+## 2026-05-27 12:47 - US-001
+- What was implemented: Backend test infrastructure setup (pytest + DRF)
+- Files changed:
+  - `shop_api/requirements-dev.txt` (created) - test dependencies
+  - `shop_api/pyproject.toml` (created) - pytest configuration
+  - `shop_api/config/settings/test.py` (created) - SQLite test settings
+  - `shop_api/conftest.py` (created) - common fixtures (api_client, test_user, admin_user, auth_client, admin_client)
+  - `shop_api/apps/users/tests.py` (updated) - smoke tests
+- **Learnings for future iterations:**
+  - Test settings use SQLite in-memory and MD5PasswordHasher for speed
+  - InMemoryStorage avoids file system side effects in tests
+  - `force_authenticate()` is the cleanest way to test authenticated endpoints
+  - pytest-cov configured to cover `apps/` and `common/` directories
+---
+
+## 2026-05-27 14:30 - US-002
+- What was implemented: User module tests (register, login, JWT auth, guest access)
+- Files changed:
+  - `shop_api/conftest.py` (updated) - deferred get_user_model() into fixtures to fix AppRegistryNotReady
+  - `shop_api/apps/users/tests.py` (updated) - 24 comprehensive tests across 5 test classes
+- Test coverage:
+  - TestUserModel (2 tests): user creation, superuser creation
+  - TestRegister (11 tests): success, duplicate username, short password, no letter, no digit, missing fields, password mismatch, invalid username chars, pure digits
+  - TestLogin (4 tests): success, wrong password, nonexistent user, missing fields
+  - TestJWTAuth (4 tests): refresh success, invalid refresh, auth required, authenticated me
+  - TestGuestAccess (3 tests): browse products, cannot create order, cannot access cart
+- **Learnings for future iterations:**
+  - `conftest.py` must NOT call `get_user_model()` at module level — use local imports inside fixtures instead
+  - `UserView` (RetrieveUpdateAPIView) returns serialized data directly, not wrapped in `success()` — so `resp.data["username"]` not `resp.data["data"]["username"]`
+  - `admin_user` fixture in conftest creates username="admin" — use different usernames in test classes to avoid UNIQUE constraint conflicts
+  - pytest-django must be installed before pytest will recognize DJANGO_SETTINGS_MODULE from pyproject.toml
+  - rtk proxy supports inline Python with `python -c "..."` to run commands needing env vars
+---
+
+## 2026-05-27 16:00 - US-003
+- What was implemented: Product module tests (CRUD, categories, SKU, permissions, pricing)
+- Files changed:
+  - `shop_api/apps/products/tests.py` (rewritten) - 54 comprehensive tests across 8 test classes
+- Test coverage:
+  - TestProductList (10 tests): empty list, active-only filter, deleted exclusion, pagination, category filter, featured filter, search by name/description, ordering, response structure
+  - TestProductDetail (8 tests): 200 OK, 404 for deleted/draft, detail structure, SKU yuan conversion, min price, view count increment, images in response
+  - TestAdminProductCRUD (10 tests): admin list, list excludes deleted, create, update, status change, soft delete, batch activate/deactivate/delete, invalid batch action
+  - TestNonAdminPermission (6 tests): 403 for list/create/update/delete/batch, 401 for unauthenticated
+  - TestAdminSKU (6 tests): list/create/update/delete SKUs, yuan fields, non-admin denied
+  - TestAdminCategory (5 tests): list/create/update/delete categories, non-admin denied
+  - TestCategoryEndpoints (4 tests): tree structure, inactive exclusion, flat list, flat inactive exclusion
+  - TestSKUPricing (5 tests): min price active/inactive/none, price filter min/max
+- **Learnings for future iterations:**
+  - Migration `0003_create_superuser` creates a "admin" superuser — test fixtures must use unique usernames (e.g., `prod_admin`) to avoid UNIQUE constraint conflicts
+  - Django's ImageField validates file content — test images must use Pillow to create valid JPEG, not raw bytes
+  - Admin SKU list endpoint uses DRF's default pagination — access via `resp.data["results"]` not `resp.data` directly
+  - Category endpoints have `pagination_class = None` so `resp.data` is a flat list, but `0002_seed_categories` migration seeds 12 categories — tests must filter by name instead of counting total
+  - `AdminProductBatchView` returns `success(message="参数错误", code=400)` for invalid actions — status is 400, not 200
+---
+
+## Codebase Patterns (cont.)
+- When testing user isolation, each test client needs its own `APIClient()` instance — sharing `api_client` across fixtures causes auth state collisions
+- Cart prices are in fen (cents); views divide by 100 for yuan display — test assertions must use matching math
+- `CartItem` has `unique_together = ("user", "sku")` — `CartService.add()` uses `get_or_create` to handle this
+- DRF throttle rates are class-level (`SimpleRateThrottle.THROTTLE_RATES`) evaluated at import time — `override_settings` doesn't affect them; patch the class attribute directly
+- Custom exception handler wraps all responses in `{"code", "message", "errors"}` — test 429/400/404 assertions must check `resp.data["message"]` not `resp.data["detail"]`
+- Frontend API errors: `request.js` interceptor shows ElMessage for 401/403/404/500/network; 400 validation errors are NOT shown (views handle field-level errors via `error.errors`)
+
+## 2026-05-27 17:00 - US-004
+- What was implemented: Shopping cart module tests (49 tests)
+- Files changed:
+  - `shop_api/apps/cart/tests.py` (rewritten) - 49 comprehensive tests across 9 test classes
+- Test coverage:
+  - TestCartAuth (7 tests): all endpoints require authentication
+  - TestCartAdd (11 tests): single item, quantity increment, accumulation, multiple SKUs, inactive SKU, nonexistent SKU, missing fields, quantity validation, default selected
+  - TestCartGet (8 tests): empty cart, items with yuan conversion, total calculation, selected_total, original_price, inactive SKU hiding, user isolation, response structure
+  - TestCartUpdate (7 tests): quantity, selected, both fields, nonexistent item, quantity validation (zero/max), subtotal recalculation
+  - TestCartDelete (3 tests): single item, nonexistent idempotent, partial delete
+  - TestCartClear (2 tests): full clear, empty clear
+  - TestCartSelectAll (3 tests): toggle select/deselect, default true, deselect clears selected_total
+  - TestCartRemoveSelected (4 tests): bulk remove, empty list fails, nonexistent IDs succeed, missing field fails
+  - TestCartEdgeCases (4 tests): yuan conversion precision, quantity*price math, partial update preserves other fields
+- **Learnings for future iterations:**
+  - Each `APIClient()` instance must be independent when testing user isolation — sharing the `api_client` fixture and calling `force_authenticate()` on it overwrites auth for all users sharing that instance
+  - `CartService.add()` increments quantity (does not set) — calling add(sku_id, 2) twice gives quantity=4, not 2
+  - Cart GET view silently skips inactive SKUs without cleaning them up — items referencing deactivated SKUs remain in DB but are invisible
+  - `CartUpdateSerializer` has both fields optional — passing no valid fields is a no-op that still returns success
+---
+
+## 2026-05-27 18:30 - US-005
+- What was implemented: Order flow integration tests (31 tests)
+- Files changed:
+  - `shop_api/apps/orders/tests.py` (rewritten) - 31 comprehensive tests across 5 test classes
+- Test coverage:
+  - TestOrderCreate (10 tests): selected cart → order, unique order numbers, item snapshots, cart cleared, remark, multiple SKUs, empty cart, no selected items, inactive SKU, unauthenticated
+  - TestPaymentFlow (9 tests): create mock payment, callback completes order, download count incremented, cannot pay already paid, cannot pay others' order, nonexistent order, payment query, missing payment_no, already processed callback
+  - TestOrderCancel (4 tests): cancel pending, cannot cancel paid, nonexistent order, others' order
+  - TestOrderListDetail (5 tests): list orders, filter by status, order detail, others' order 404, unauthenticated
+  - TestFullFlow (3 tests): full cart→order→payment→download chain, cart cleared after order, partial selection only orders selected items
+- **Learnings for future iterations:**
+  - SKU model has no stock/quantity field — digital products don't track inventory; the "库存不足" acceptance criteria from PRD doesn't apply to current implementation
+  - `PaymentCallbackView` uses `AllowAny` permission — no auth needed for mock callbacks, so test uses a fresh `APIClient()` without authentication
+  - `_complete_order()` in payment views marks order as "paid" then immediately "completed" in two save() calls — both status transitions happen atomically in one callback
+  - `OrderCreateSerializer.create()` pops `quantity` from `item_data` before creating OrderItem — the quantity determines how many OrderItem rows are created (one per unit)
+  - `OrderCancelView` only allows cancelling "pending" orders — paid/completed/cancelled orders return error
+---
+
+## 2026-05-27 19:30 - US-006
+- What was implemented: Coupon module tests (41 tests)
+- Files changed:
+  - `shop_api/apps/marketing/tests.py` (rewritten) - 41 comprehensive tests across 5 test classes
+- Test coverage:
+  - TestCouponList (10 tests): active-only filter, inactive exclusion, not-yet-started exclusion, expired exclusion, unauthenticated access, response structure, value_yuan conversion (minus/discount/fixed), min_amount_yuan conversion
+  - TestCouponClaim (9 tests): success, increments used count, duplicate rejected, inactive rejected, not-yet-started rejected, expired rejected, fully claimed rejected, nonexistent rejected, missing coupon_id rejected
+  - TestMyCoupons (7 tests): empty list, list claimed, filter unused, filter used, user isolation, unauthenticated rejected, response structure
+  - TestAdminCoupon (8 tests): admin list, create, update, delete, non-admin cannot list/create, unauthenticated cannot access, admin detail
+  - TestCouponEdgeCases (7 tests): same coupon different users, used count reaches total, exactly at start/end time, unlimited total zero, claim response data
+- **Learnings for future iterations:**
+  - TestCouponList tests need explicit `db` fixture because `_coupon()` helper calls Coupon.objects.create() — api_client alone doesn't enable DB access
+  - Coupon with total=0 is considered "fully claimed" (0 >= 0 is True) — this is correct behavior, not a bug
+  - CouponClaimView wraps response in `success()` helper, so coupon data is at `resp.data["data"]` not `resp.data` directly
+  - Coupon model's unique constraint on `code` means test fixtures must use unique codes per test
+  - `CouponClaimSerializer.save()` increments coupon.used atomically — no race condition protection at serializer level
+---
+
+## 2026-05-27 20:00 - US-007
+- What was implemented: API rate limiting (throttling) — 12 comprehensive tests
+- Files changed:
+  - `shop_api/tests/test_throttling.py` (rewritten) — 12 tests across 5 test classes
+- Test coverage:
+  - TestAnonThrottle (3 tests): first request succeeds, throttled after limit, 429 response has message
+  - TestUserThrottle (3 tests): first request succeeds, throttled after limit, separate limits per user
+  - TestPaymentThrottle (2 tests): payment create throttled, payment callback throttled
+  - TestThrottleConfig (4 tests): anon rate=20/min, user rate=60/min, payment rate=10/min, throttle classes configured
+- Pre-existing implementation (already in codebase):
+  - `shop_api/config/settings/base.py`: DEFAULT_THROTTLE_CLASSES with AnonRateThrottle + UserRateThrottle, rates: anon=20/min, user=60/min, payment=10/min
+  - `shop_api/common/throttles.py`: PaymentRateThrottle custom throttle class
+  - Payment views use PaymentRateThrottle
+- **Learnings for future iterations:**
+  - DRF `SimpleRateThrottle.THROTTLE_RATES` is a class attribute evaluated at import time — `override_settings` does NOT change it. Must patch `SimpleRateThrottle.THROTTLE_RATES` directly in test fixtures to override throttle rates.
+  - Custom exception handler (`common/exceptions.py`) wraps all responses including 429 in `{"code": N, "message": "...", "errors": ...}` format — assertions must check `resp.data["message"]` not `resp.data["detail"]`.
+  - `cache.clear()` alone doesn't reset DRF throttle class-level rate caches — need to explicitly set `cls.rate = None` on each throttle class.
+---
+
+## 2026-05-27 20:30 - US-008
+- What was implemented: API 文档自动生成 (drf-spectacular OpenAPI 3.0)
+- Files changed:
+  - `shop_api/requirements.txt` — added drf-spectacular>=0.27
+  - `shop_api/config/urls.py` — conditionally added /api/schema/ and /api/docs/ endpoints
+  - `shop_api/apps/users/serializers.py` — added help_text and docstrings to RegisterSerializer, LoginSerializer
+  - `shop_api/apps/cart/serializers.py` — added help_text and docstrings to all cart serializers
+  - `shop_api/apps/orders/serializers.py` — added help_text and docstrings to order serializers
+  - `shop_api/apps/marketing/serializers.py` — added help_text and docstrings to coupon serializers
+  - `shop_api/apps/products/serializers.py` — added docstrings to product/category/SKU serializers
+  - `shop_api/tests/test_spectacular.py` (created) — 6 tests (skipped without package)
+  - `shop_api/setup_spectacular.py` (created) — helper script to enable drf-spectacular settings
+- **Setup required:** User must run `pip install drf-spectacular` then `python setup_spectacular.py`
+- **Learnings for future iterations:**
+  - Can't add a package to INSTALLED_APPS without it being installed — Django fails at import time. Use conditional URL patterns (`try/except ImportError`) and skip test markers for optional dependencies.
+  - drf-spectacular reads serializer docstrings for descriptions and `help_text` for field-level docs in the OpenAPI schema.
+  - Created `setup_spectacular.py` to automate settings changes after package installation — avoids manual editing of base.py.
+---
+
+## 2026-05-27 21:00 - US-009
+- What was implemented: 结构化日志体系
+- Files changed:
+  - `shop_api/config/logging.py` (created) — structured logging config with JsonFormatter and ColorFormatter
+  - `shop_api/config/settings/base.py` — replaced inline LOGGING with import from config.logging
+- Features:
+  - Production: JSON format logs (timestamp, level, logger, module, message) for ELK parsing
+  - Development: Colorful console output with ANSI colors
+  - Payment module gets dedicated logger with both file + console handlers at INFO level
+  - Rotating file handler for all logs (5MB max, 5 backups)
+- **Learnings for future iterations:**
+  - Avoid `pythonjsonlogger` dependency — custom JsonFormatter using stdlib `json` is sufficient and avoids an extra package
+  - `IS_PRODUCTION` detection via `DJANGO_SETTINGS_MODULE` suffix works well for switching log formats
+  - Payment logger (`apps.payment`) needs `propagate: False` to avoid duplicate entries in root handler
+---
+
+## 2026-05-27 21:15 - US-010
+- What was implemented: 健康检查端点 /api/health/
+- Files changed:
+  - `shop_api/config/views.py` (created) — HealthCheckView with db + cache checks
+  - `shop_api/config/urls.py` — added /api/health/ route
+  - `shop_api/tests/test_health.py` (created) — 5 tests
+- Test coverage:
+  - HealthCheckView checks db connection and cache r/w, returns { status, db, cache }
+  - 200 when healthy, 503 when any check fails
+  - No authentication required (AllowAny + no auth classes)
+- **Learnings for future iterations:**
+  - Don't mock `connection.ensure_connection` globally when cache is database-backed — mock at the view module level (`config.views.connection`) instead to avoid breaking cache reads in the same request
+  - Health check endpoint belongs in `config/views.py` (not any app) since it's cross-cutting infrastructure
+---
+
+## 2026-05-27 21:30 - US-011
+- What was implemented: 登录失败锁定（暴力破解防护）
+- Files changed:
+  - `shop_api/apps/users/views.py` — added login lockout logic (5 failures → 15 min lockout)
+  - `shop_api/tests/test_login_lockout.py` (created) — 6 tests
+  - `shop_api/config/logging.py` — fixed ColorFormatter bug (`recordasctime` → `self.formatTime()`)
+- Test coverage:
+  - TestLoginLockout (6 tests): success login, lockout after 5 failures, 429 when locked, success resets counter, independent per-user lockout, friendly error message
+- **Learnings for future iterations:**
+  - `logging.Formatter` subclass must inherit from `logging.Formatter` to access `recordasctime` — custom formatters that don't inherit need to use `self.formatTime(record)` instead
+  - Login lockout uses cache keys `login_fail_{identifier}` and `login_lock_{identifier}` with TTL matching the lockout duration
+  - `LoginSerializer.validate()` calls `authenticate(username=...)` — tests must use the actual username field, not email
+---
+
+## 2026-05-27 22:00 - US-012
+- What was implemented: 微信支付后端 (13 tests)
+- Files changed:
+  - `shop_api/apps/payment/backends/wechat.py` (created) — WechatPaymentBackend implementing PaymentBackend ABC
+  - `shop_api/apps/payment/views.py` — registered wechat backend in get_backend()
+  - `shop_api/apps/payment/models.py` — added "wechat" to METHOD_CHOICES
+  - `shop_api/tests/test_wechat_payment.py` (created) — 13 tests across 3 test classes
+- Test coverage:
+  - TestWechatSandbox (6 tests): create_payment pending, pay_url format, query_payment success, verify_notification auto-succeeds, fail result handling, refund not_supported
+  - TestWechatProduction (4 tests): create_payment builds params, query_payment pending, valid signature verification, bad signature rejection
+  - TestWechatSign (3 tests): deterministic signing, empty value skipping, uppercase hex output
+- **Learnings for future iterations:**
+  - WeChat sandbox mode auto-succeeds verification — useful for integration tests without real API calls
+  - `_sign()` method sorts params alphabetically and skips empty values — same pattern as Alipay but with MD5 instead of RSA
+  - Payment model METHOD_CHOICES must be updated when adding new backends — views.py get_backend() and model choices are separate registration points
+---
+
+## 2026-05-27 22:15 - US-013
+- What was implemented: 商品搜索后端 (14 tests)
+- Files changed:
+  - `shop_api/apps/products/views.py` — added ProductSearchView with Q-object search across name, description, category
+  - `shop_api/apps/products/urls.py` — added /search/ route
+  - `shop_api/tests/test_product_search.py` (created) — 14 tests across 4 test classes
+- Test coverage:
+  - TestSearchBasic (5 tests): search by name, description, category name, multiple matches, case insensitive
+  - TestSearchFilters (5 tests): empty keyword, no q param, whitespace, inactive excluded, no match
+  - TestSearchPagination (2 tests): standard pagination structure, result fields
+  - TestSearchPermission (2 tests): unauthenticated access, partial keyword matching
+- **Learnings for future iterations:**
+  - DRF's `SearchFilter` on ProductListView only searches name and description — the new SearchView adds category name via Q-object OR query
+  - `Product.objects.none()` returns empty queryset for empty search keywords — cleaner than filtering with impossible condition
+  - `select_related("category")` on search queryset avoids N+1 queries when serializing category_name
+---
+
+## 2026-05-27 22:30 - US-016
+- What was implemented: 商品浏览量统计 — IP-based 24h dedup + admin ranking (10 tests)
+- Files changed:
+  - `shop_api/apps/products/views.py` — added cache-based IP deduplication to ProductDetailView
+  - `shop_api/apps/admin_panel/views.py` — added AdminProductViewCountView for ranking
+  - `shop_api/apps/admin_panel/urls.py` — added /products/views/ route
+  - `shop_api/tests/test_view_count.py` (created) — 10 tests across 2 test classes
+- Test coverage:
+  - TestViewCountDetail (5 tests): returns view_count, increments, same IP dedup, different IPs increment, cache key format
+  - TestAdminViewCountRanking (5 tests): admin access, non-admin denied, unauthenticated denied, ranking order, excludes deleted
+- **Learnings for future iterations:**
+  - Cache-based dedup (`cache.set(key, True, 86400)`) is simpler than DB tracking for IP-based 24h dedup
+  - `HTTP_X_FORWARDED_FOR` may contain comma-separated IPs — always split and take first
+  - Admin view count endpoint uses `APIView` + `values()` + `success()` instead of `ListAPIView` since `values()` returns dicts, not model instances
+  - `admin_user` fixture from conftest conflicts with migration-created "admin" superuser — test-local fixtures with unique usernames are required
+---
+
+## 2026-05-27 22:45 - US-015
+- What was implemented: 评价系统增强 — images JSONField (8 tests)
+- Files changed:
+  - `shop_api/apps/reviews/models.py` — added `images` JSONField (default=list)
+  - `shop_api/apps/reviews/serializers.py` — added images to ReviewSerializer and ReviewCreateSerializer (max 5 URLs)
+  - `shop_api/apps/reviews/migrations/0002_review_images.py` (created) — migration for images field
+  - `shop_api/tests/test_review_images.py` (created) — 8 tests across 2 test classes
+- Test coverage:
+  - TestReviewImages (6 tests): create with images, create without images, max 5 limit, URL validation, list includes images, JSON storage
+  - TestReviewStats (2 tests): stats with reviews, stats empty
+- **Learnings for future iterations:**
+  - Review model already had `rating` field and `unique_together` constraint — US-015 only needed the `images` addition
+  - `JSONField(default=list)` is the correct way to store variable-length lists in Django — no need for a separate image model for simple cases
+  - `serializers.ListField(child=serializers.URLField(), max_length=5)` provides both list validation and URL format validation
+---
+
+## 2026-05-27 23:00 - US-017
+- What was implemented: 前端 TypeScript 渐进迁移 — API 层和 Store 层类型定义
+- Files changed:
+  - `frontend/tsconfig.json` (created) — TypeScript config with allowJs: true, strict mode
+  - `frontend/src/env.d.ts` (created) — Vite env and .vue module declarations
+  - `frontend/src/api/types.ts` (created) — Shared API response types (ApiResponse, PaginatedResponse)
+  - `frontend/src/api/user.d.ts` (created) — User/auth API type definitions
+  - `frontend/src/api/product.d.ts` (created) — Product/category/SKU API type definitions
+  - `frontend/src/api/cart.d.ts` (created) — Cart API type definitions
+  - `frontend/src/api/order.d.ts` (created) — Order API type definitions
+  - `frontend/src/api/payment.d.ts` (created) — Payment API type definitions
+  - `frontend/src/api/adminProduct.d.ts` (created) — Admin product API type definitions
+  - `frontend/src/api/adminPanel.d.ts` (created) — Admin panel API type definitions
+  - `frontend/src/stores/types.ts` (created) — Store state type definitions
+  - `frontend/package.json` (updated) — added typecheck script, TypeScript devDependencies
+- Verification: `vue-tsc --noEmit` passes, `vite build` succeeds
+- **Learnings for future iterations:**
+  - TypeScript 6 deprecates `baseUrl` — use `moduleResolution: "bundler"` instead for Vite projects
+  - API response interceptor wraps all responses in `{ code, message, data }` — types reflect this via `ApiResponse<T>`
+  - `.d.ts` files provide types for existing `.js` modules without converting them — ideal for gradual migration
+  - Frontend uses relative imports (not `@/` aliases), so no `paths` config needed
+---
+
+## 2026-05-27 23:30 - US-014
+- What was implemented: 商品搜索前端 — search input with debounce + keyword highlighting
+- Files changed:
+  - `frontend/src/views/storefront/ProductList.vue` — added search input with 300ms debounce, clear button, URL sync
+  - `frontend/src/components/ProductCard.vue` — added keyword prop and `highlightText()` for search result highlighting
+- Features:
+  - Search input in results toolbar with magnifying glass icon and clear button
+  - 300ms debounce before updating URL query params
+  - Keyword highlighting in product name and category via `<mark>` tags
+  - Search state preserved in URL (survives navigation, shareable)
+  - "清空筛选" clears category/featured but preserves search
+  - Input expands on focus (200px → 260px) for visual polish
+- **Learnings for future iterations:**
+  - `v-html` with `highlightText()` is the simplest way to add keyword highlighting without a dedicated component
+  - Must escape regex special chars in search keyword to prevent injection in `new RegExp()`
+  - `clearFilters()` already preserves the search term — designed that way from the start
+  - Route query watcher syncs `searchInput` ref when URL changes externally (e.g., back/forward navigation)
+---
+
+## 2026-05-27 23:45 - US-018
+- What was implemented: GitHub Actions CI pipeline (backend + frontend)
+- Files changed:
+  - `.github/workflows/ci.yml` (created) — CI workflow with backend and frontend jobs
+- Features:
+  - Triggers on push to master and ralph/* branches, and on PRs to master
+  - Backend job: Python 3.12, pip cache, install dev deps, pytest with coverage XML
+  - Frontend job: Node.js 20, npm ci, typecheck (vue-tsc), build (vite)
+  - Coverage artifact uploaded (7-day retention)
+- **Learnings for future iterations:**
+  - Test settings use SQLite + InMemoryStorage — no MySQL needed in CI
+  - Frontend has no test script, so CI uses typecheck + build instead
+  - `cache-dependency-path` must point to the right file for pip (requirements-dev.txt) and npm (package-lock.json)
+---
+
+## 2026-05-27 23:50 - US-019
+- What was implemented: Docker development environment (docker-compose up one-click start)
+- Files changed:
+  - `shop_api/Dockerfile` (created) — Python 3.11-slim, MySQL client libs, dev dependencies
+  - `shop_api/docker-entrypoint.sh` (created) — runs migrations then starts dev server
+  - `frontend/Dockerfile` (created) — Node 20-slim, npm install, vite dev server
+  - `docker-compose.yml` (created) — db (MySQL 8.0) + backend + frontend orchestration
+  - `.env.docker` (created) — Docker-specific env vars (DB_HOST=db)
+  - `.dockerignore` (created) — excludes __pycache__, node_modules, .git, etc.
+  - `frontend/.dockerignore` (created) — excludes node_modules, dist
+  - `frontend/vite.config.js` (updated) — added `host: true` and `VITE_PROXY_TARGET` env var for Docker proxy
+- Usage: `docker-compose up` from project root
+  - Backend: http://localhost:8000 (Django with auto migrations)
+  - Frontend: http://localhost:5173 (Vite with HMR)
+  - MySQL: localhost:3306 (persistent volume)
+- **Learnings for future iterations:**
+  - Windows-created shell scripts need `sed -i 's/\r$//'` in Dockerfile to fix CRLF line endings
+  - Vite `host: true` is needed for Docker containers to accept external connections
+  - `VITE_PROXY_TARGET` env var lets Vite proxy to `backend:8000` in Docker while defaulting to `127.0.0.1:8000` locally
+  - MySQL healthcheck with `mysqladmin ping` + `depends_on: condition: service_healthy` ensures backend waits for DB
+  - Frontend volume uses anonymous volume `/app/node_modules` to prevent host node_modules from overriding container's
+---
+## 2026-05-27 24:00 - US-020
+- What was implemented: 环境变量规范化 — comprehensive .env.example files + README docs
+- Files changed:
+  - `shop_api/.env.example` (rewritten) — all backend env vars with descriptions
+  - `frontend/.env.example` (created) — frontend VITE env vars
+  - `README.md` — added 环境配置 section with quick start guide and env var tables
+- **Learnings for future iterations:**
+  - Django settings already use `os.environ.get()` for all sensitive config — no code changes needed
+  - `.gitignore` already excludes `.env` files but includes `.env.example` via `!.env.example`
+  - WeChat Pay config is read from `settings.WECHAT_PAY` dict, not individual env vars — document as WECHAT_PAY_* prefix for future refactoring
+---
+
+## 2026-05-27 24:15 - US-021
+- What was implemented: Pinia Store 持久化 — cartStore and userStore persist to localStorage
+- Files changed:
+  - `frontend/package.json` — added pinia-plugin-persistedstate dependency
+  - `frontend/src/main.js` — registered pinia-plugin-persistedstate on Pinia instance
+  - `frontend/src/stores/cart.js` — added `persist: { pick: ['items'] }` config
+  - `frontend/src/stores/user.js` — added `persist: { pick: ['userInfo'] }` config
+- Features:
+  - cartStore persists `items` array to localStorage (key: "cart")
+  - userStore persists `userInfo` to localStorage (key: "user")
+  - Tokens (`token`, `refreshTokenVal`) are excluded from plugin persistence — already manually handled by `setTokens()`/`logout()` via localStorage API
+  - On logout, `userInfo = null` is auto-persisted, clearing session state
+  - Browser verified: data survives page refresh, plugin correctly restores state
+- **Learnings for future iterations:**
+  - `pinia-plugin-persistedstate` only persists after store state changes from initial values — empty/default stores won't write to localStorage until modified
+  - User store already manually persisted tokens via `localStorage.setItem()` — using `pick: ['userInfo']` avoids duplication while keeping the existing token flow intact
+  - Plugin registers via `pinia.use()` BEFORE `app.use(pinia)` — order matters
+  - `persist.pick` is the cleanest way to exclude specific fields (like `loading`) from persistence
+---
+
+## 2026-05-27 24:30 - US-022
+- What was implemented: 路由过渡动画封装 — PageTransition wrapper component with reduced-motion support
+- Files changed:
+  - `frontend/src/components/PageTransition.vue` (created) — wrapper component encapsulating Transition + GSAP via usePageTransition
+  - `frontend/src/composables/usePageTransition.js` (updated) — added prefers-reduced-motion check, skips animation when enabled
+  - `frontend/src/views/storefront/MainLayout.vue` (updated) — replaced inline Transition with PageTransition component
+  - `frontend/src/views/admin/AdminLayout.vue` (updated) — added PageTransition wrapping router-view (was bare before)
+- Features:
+  - Fade-in + slight upward slide on enter (opacity 0→1, y 16→0, 350ms)
+  - Fade-out + slight upward slide on leave (opacity 1→0, y 0→-8, 180ms)
+  - `prefers-reduced-motion: reduce` skips all GSAP animations (calls `done()` immediately)
+  - `mode="out-in"` prevents overlapping page renders
+  - ScrollToTop composable still works independently via MainLayout watcher
+- **Learnings for future iterations:**
+  - `usePageTransition` composable depends on `useReducedMotion` from `useGsap.js` — it returns a `ref`, so access via `.value`
+  - AdminLayout had no page transitions before — wrapping with PageTransition gives admin panel consistent UX with storefront
+  - `PageTransition` component is stateless — it just delegates to the composable, making it easy to reuse anywhere
+  - `scrollToTop` remains in MainLayout (not in PageTransition) because it's a layout concern, not a transition concern
+---
+
+## 2026-05-27 17:01 - US-023
+- What was implemented: API 错误处理统一 — centralized error handling in request.js interceptor
+- Files changed:
+  - `frontend/src/utils/request.js` — added ElMessage import, centralized error display for 401/403/404/500/network errors
+  - `frontend/src/views/storefront/Checkout.vue` — simplified catch block (removed redundant ElMessage.error)
+  - `frontend/src/views/storefront/Downloads.vue` — simplified catch block
+  - `frontend/src/views/storefront/OrderDetail.vue` — simplified catch block
+  - `frontend/src/views/storefront/Profile.vue` — simplified catch block
+- Features:
+  - 401: shows "登录已过期，请重新登录" + redirects to login
+  - 403: shows "无权限访问"
+  - 404: shows "资源不存在"
+  - 500: shows "服务器繁忙，请稍后再试"
+  - Network error: shows "网络连接失败，请检查网络"
+  - 400 (validation) errors NOT shown by interceptor — views handle field-level errors via `error.errors`
+- **Learnings for future iterations:**
+  - `request.js` must import `ElMessage` from `element-plus` directly — can't rely on app-level registration for use in interceptors
+  - 400 validation errors should NOT be shown by the interceptor because views need to parse `error.errors` for field-level messages (e.g., Login/Register forms)
+  - Catch blocks that only did `ElMessage.error(error.message || 'fallback')` can be simplified to `catch {}` since the interceptor handles it
+  - Catch blocks with additional logic (redirects, state updates) should keep the catch but remove the error display
+---
+
+## 2026-05-27 17:30 - US-024
+- What was implemented: 购物车数量脉冲动画 — cart icon pulse + badge bounce on add
+- Files changed:
+  - `frontend/src/composables/useMicroInteraction.js` — added `useReducedMotion` import/guard, reduced `bounceBadge` duration from 400ms to 250ms
+  - `frontend/src/views/storefront/MainLayout.vue` — restructured cart button with div wrapper for ref access, added `useMicroInteraction` import, added `watch(cartStore.count)` to trigger bounce + pulse on count increase, added `.cart-btn-wrap` and `.cart-btn` CSS, added `prefers-reduced-motion` suppression for badge animation
+- Features:
+  - Cart icon pulses (scale 1→0.95→1, 200ms) when item is added
+  - Badge bounces in (scale 0.5→1 with rotation, 250ms, `back.out(2)` easing)
+  - Badge-pop CSS transition reduced from 350ms to 250ms
+  - `prefers-reduced-motion: reduce` disables all cart animations
+  - All animations < 300ms
+- **Learnings for future iterations:**
+  - `useReducedMotion` is a singleton ref shared across all callers — registering listeners in composable is safe as long as it's called once per component
+  - Template ref on `router-link` gives component instance, not DOM element — use a wrapper div for direct DOM ref access
+  - `watch(cartStore.count, (new, old) => ...)` naturally receives old/new values, no need for separate `prevCount` tracking
+---
+
+## 2026-05-27 25:00 - US-025
+- What was implemented: 商品卡片骨架屏 — Element Plus el-skeleton with shimmer animation
+- Files changed:
+  - `frontend/src/main.js` — added el-skeleton and el-skeleton-item CSS imports
+  - `frontend/src/views/storefront/ProductList.vue` — replaced custom skeleton divs with `el-skeleton` + `el-skeleton-item` components
+- Features:
+  - 8 skeleton cards shown during initial load (before products arrive)
+  - `el-skeleton` with `animated` prop provides built-in shimmer effect
+  - Skeleton items use `variant="image"` for the card image area and `variant="text"` for text lines
+  - Layout matches real ProductCard structure (image, category, title, price, download count)
+  - Removed old custom `.skeleton-*` CSS classes (no longer needed)
+  - `prefers-reduced-motion` already handled by global.css and Element Plus
+- **Learnings for future iterations:**
+  - `el-skeleton` must be registered or imported with its CSS (`element-plus/es/components/skeleton/style/css`) — Element Plus tree-shakes styles
+  - Element Plus `el-skeleton-item` `variant` prop: "image" (16:9 ratio block), "text" (line), "circle", "rect", "button" — "image" matches product card aspect ratio
+  - The old custom skeleton used `.skeleton` class from global.css which already had shimmer animation — `el-skeleton` provides the same effect out of the box
+  - Skeleton shows only on initial load (`loading && !products.length`) — subsequent page/sort changes show existing products while fetching
+---
+
+## 2026-05-27 25:30 - US-026
+- What was implemented: 暗色模式基础支持 — CSS variables theme switching with localStorage persistence and system preference follow
+- Files changed:
+  - `frontend/src/styles/global.css` — added `[data-theme="light"]` CSS variable overrides (~120 new rules covering all surfaces, admin shell, Element Plus)
+  - `frontend/src/composables/useTheme.js` (created) — theme state composable with localStorage persistence, system preference detection, and toggle
+  - `frontend/src/views/storefront/MainLayout.vue` — added theme toggle button (moon/sun icon) in nav bar
+  - `frontend/src/views/admin/AdminLayout.vue` — added theme toggle button in admin topbar
+  - `frontend/index.html` — added inline script to set `data-theme` before paint (prevents flash)
+- Features:
+  - Dark theme is the default (matches existing design)
+  - Light theme overrides all CSS variables: backgrounds, text colors, borders, shadows, glass morphism
+  - Theme toggle button shows moon (🌙) in dark mode, sun (☀️) in light mode
+  - Preference saved to localStorage under key `shopease-theme`
+  - Follows system `prefers-color-scheme` when no saved preference
+  - Listens for system preference changes in real-time
+  - Inline script in index.html sets theme before first paint (no flash)
+  - Admin panel also has theme toggle and full light theme support
+- **Learnings for future iterations:**
+  - The app was already dark-themed, so "dark mode support" meant adding a light theme variant via `[data-theme="light"]` overrides
+  - Inline `<script>` in index.html before module scripts is the only way to prevent flash of wrong theme (FOUC)
+  - `useTheme` composable uses module-level `theme` ref as singleton — multiple callers share the same reactive state
+  - Admin layout uses scoped styles with hardcoded colors — light theme overrides need `!important`-free selectors via `[data-theme="light"] .admin-shell` specificity
+  - Element Plus components inherit CSS custom properties — overriding `--el-*` vars in theme block handles most Element Plus styling
+---

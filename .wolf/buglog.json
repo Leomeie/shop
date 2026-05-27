@@ -1,0 +1,437 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-05-22T17:22:21.452Z",
+      "error_message": "Significant refactor of ",
+      "file": "shop_api/apps/payment/backends/alipay.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 18→40 lines (2 removed) | Also: from cryptography.hazmat.primitives.asymmetric imp; pub_key_str = settings.ALIPAY[\"ALIPAY_PUBLIC_KEY\"] | Also: \"\"\"Ensure a PEM key has proper headers, footers, a; return raw  # Already formatted",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-05-22T17:24:17.602Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-05-22T17:37:24.697Z",
+      "error_message": "Incorrect value in code",
+      "file": "shop_api/apps/payment/backends/alipay.py",
+      "root_cause": "Had \"public\"",
+      "fix": "Changed to \"), \"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-22T17:37:24.697Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-05-22T17:41:15.883Z",
+      "error_message": "Significant refactor of ",
+      "file": "shop_api/apps/payment/backends/alipay.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 6→13 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-22T17:41:15.883Z"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-05-27T01:55:25.735Z",
+      "error_message": "Incorrect value in code",
+      "file": "graphify-out/.graphify_step_ast.py",
+      "root_cause": "Had \"utf-8\"",
+      "fix": "Changed to \"utf-8-sig\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T01:55:25.735Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-05-27T01:55:26.680Z",
+      "error_message": "Incorrect value in code",
+      "file": "graphify-out/.graphify_step_cache.py",
+      "root_cause": "Had \"utf-8\"",
+      "fix": "Changed to \"utf-8-sig\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T01:55:26.680Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-05-27T02:04:37.212Z",
+      "error_message": "Incorrect value in code",
+      "file": "graphify-out/.graphify_chunk_07.json",
+      "root_cause": "Had \"label_mismatch\"",
+      "fix": "Changed to \"label\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T02:04:37.212Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-05-27T04:47:20.287Z",
+      "error_message": "Incorrect value in code",
+      "file": "shop_api/pyproject.toml",
+      "root_cause": "Had \"config.settings.development\"",
+      "fix": "Changed to \"config.settings.test\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "toml"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T04:47:20.287Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-05-27T05:23:32.063Z",
+      "error_message": "Wrong return value",
+      "file": "shop_api/apps/products/tests.py",
+      "root_cause": "Was returning: SimpleUploadedFile(name, b\"\\xff\\xd8\\xff\" + b\"\\x00\"",
+      "fix": "Now returns: SimpleUploadedFile(name, buf.read(), content_type=",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T05:23:32.063Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-05-27T06:52:45.889Z",
+      "error_message": "Significant refactor of ",
+      "file": "shop_api/apps/cart/serializers.py",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 16→20 lines (6 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T06:52:45.889Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-05-27T06:59:24.666Z",
+      "error_message": "Significant refactor of ",
+      "file": "shop_api/config/settings/base.py",
+      "root_cause": "7 lines replaced/restructured",
+      "fix": "Rewrote 11→3 lines (7 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T06:59:24.666Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-05-27T07:37:53.857Z",
+      "error_message": "Significant refactor of ",
+      "file": "shop_api/apps/admin_panel/views.py",
+      "root_cause": "11 lines replaced/restructured",
+      "fix": "Rewrote 21→11 lines (11 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T07:37:53.857Z"
+    },
+    {
+      "id": "bug-012",
+      "timestamp": "2026-05-27T07:44:59.738Z",
+      "error_message": "Incorrect value in code",
+      "file": "shop_api/tests/test_review_images.py",
+      "root_cause": "Had \"/api/v1/reviews/product/{product.pk}//\"",
+      "fix": "Changed to \"/api/v1/reviews/product/{product.pk}/\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T07:44:59.738Z"
+    },
+    {
+      "id": "bug-013",
+      "timestamp": "2026-05-27T07:58:06.444Z",
+      "error_message": "CSS fix: ProductCard",
+      "file": "frontend/src/views/storefront/ProductList.vue",
+      "root_cause": "ProductCard: product=\"product\" /> → product=\"product\" :keyword=\"route.query.search\" />",
+      "fix": "Changed ProductCard: product=\"product\" /> → product=\"product\" :keyword=\"route.query.search\" />",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "vue"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T07:58:06.444Z"
+    },
+    {
+      "id": "bug-014",
+      "timestamp": "2026-05-27T08:00:04.907Z",
+      "error_message": "Incorrect value in code",
+      "file": "frontend/src/components/ProductCard.vue",
+      "root_cause": "Had \"card-title\"",
+      "fix": "Changed to \"highlightText(product.category_name)\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "vue"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T08:00:04.907Z"
+    },
+    {
+      "id": "bug-015",
+      "timestamp": "2026-05-27T08:00:27.826Z",
+      "error_message": "Missing guard clause",
+      "file": "frontend/src/components/ProductCard.vue",
+      "root_cause": "No early return/throw for edge case: !props.keyword || !text",
+      "fix": "Added guard clause: if (!props.keyword || !text)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "vue"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T08:00:27.826Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-05-27T08:09:18.792Z",
+      "error_message": "Significant refactor of ",
+      "file": "frontend/vite.config.js",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 13→14 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T08:09:18.792Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-05-27T08:13:16.254Z",
+      "error_message": "Significant refactor of ",
+      "file": "docker-compose.yml",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 11→16 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "yml"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T08:13:16.254Z"
+    },
+    {
+      "id": "bug-018",
+      "timestamp": "2026-05-27T08:46:16.028Z",
+      "error_message": "Incorrect value in code",
+      "file": "frontend/src/views/storefront/MainLayout.vue",
+      "root_cause": "Had '../../composables/usePageTransition'",
+      "fix": "Changed to '../../components/PageTransition.vue'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "vue"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T08:46:16.028Z"
+    },
+    {
+      "id": "bug-019",
+      "timestamp": "2026-05-27T08:59:01.624Z",
+      "error_message": "Wrong reference: error should be finally",
+      "file": "frontend/src/views/storefront/Checkout.vue",
+      "root_cause": "Used \"error\" instead of \"finally\"",
+      "fix": "Changed error → finally",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "vue"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T08:59:01.624Z"
+    },
+    {
+      "id": "bug-020",
+      "timestamp": "2026-05-27T08:59:02.839Z",
+      "error_message": "Wrong reference: ElMessage should be finally",
+      "file": "frontend/src/views/storefront/Profile.vue",
+      "root_cause": "Used \"ElMessage\" instead of \"finally\"",
+      "fix": "Changed ElMessage → finally",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "vue"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T08:59:02.839Z"
+    },
+    {
+      "id": "bug-021",
+      "timestamp": "2026-05-27T09:08:41.517Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "progress.txt",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "txt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T09:08:41.517Z"
+    },
+    {
+      "id": "bug-022",
+      "timestamp": "2026-05-27T09:12:58.835Z",
+      "error_message": "Significant refactor of ",
+      "file": "frontend/src/composables/useMicroInteraction.js",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 18→21 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T09:12:58.835Z"
+    },
+    {
+      "id": "bug-023",
+      "timestamp": "2026-05-27T09:15:06.830Z",
+      "error_message": "CSS fix: animation, transition",
+      "file": "frontend/src/views/storefront/MainLayout.vue",
+      "root_cause": "animation: badgePop 0.35s var(--ease-spring) → badgePop 0.25s var(--ease-spring); transition: opacity 0.2s ease-in → opacity 0.15s ease-in",
+      "fix": "Changed animation: badgePop 0.35s var(--ease-spring) → badgePop 0.25s var(--ease-spring); transition: opacity 0.2s ease-in → opacity 0.15s ease-in",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "vue"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-27T09:15:26.098Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-05-27T09:25:38.110Z",
+      "error_message": "Missing import: element-plus/es/components/skeleton/style/css, element-plus/es/components/skeleton-item/style/css",
+      "file": "frontend/src/main.js",
+      "root_cause": "Module(s) not imported: element-plus/es/components/skeleton/style/css, element-plus/es/components/skeleton-item/style/css",
+      "fix": "Added import(s) for element-plus/es/components/skeleton/style/css, element-plus/es/components/skeleton-item/style/css",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T09:25:38.110Z"
+    },
+    {
+      "id": "bug-025",
+      "timestamp": "2026-05-27T09:25:57.852Z",
+      "error_message": "Significant refactor of ",
+      "file": "frontend/src/views/storefront/ProductList.vue",
+      "root_cause": "8 lines replaced/restructured",
+      "fix": "Rewrote 14→18 lines (8 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "vue"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T09:25:57.852Z"
+    },
+    {
+      "id": "bug-026",
+      "timestamp": "2026-05-27T09:26:20.978Z",
+      "error_message": "CSS fix: width",
+      "file": "frontend/src/views/storefront/ProductList.vue",
+      "root_cause": "width: 44px → 100%",
+      "fix": "Changed width: 44px → 100%",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "vue"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T09:26:20.978Z"
+    },
+    {
+      "id": "bug-027",
+      "timestamp": "2026-05-27T09:39:53.576Z",
+      "error_message": "CSS fix: color",
+      "file": "frontend/src/styles/global.css",
+      "root_cause": "color: #94a3b8 → #0f172a",
+      "fix": "Changed color: #94a3b8 → #0f172a",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T09:39:53.576Z"
+    }
+  ]
+}

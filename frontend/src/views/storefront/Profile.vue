@@ -70,9 +70,7 @@ async function handleSave() {
   try {
     await userStore.fetchUserInfo()
     ElMessage.success('资料已同步')
-  } catch {
-    ElMessage.error('保存失败')
-  } finally {
+  } catch {} finally {
     loading.value = false
   }
 }

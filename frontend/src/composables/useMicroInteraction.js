@@ -1,8 +1,11 @@
 import { gsap } from './useGsap.js'
+import { useReducedMotion } from './useGsap.js'
 
 export function useMicroInteraction() {
+  const reducedMotion = useReducedMotion()
+
   function pulseButton(el) {
-    if (!el) return
+    if (!el || reducedMotion.value) return
     gsap.fromTo(el,
       { scale: 1 },
       { scale: 0.95, duration: 0.1, ease: 'power2.in', yoyo: true, repeat: 1 }
@@ -10,10 +13,10 @@ export function useMicroInteraction() {
   }
 
   function bounceBadge(el) {
-    if (!el) return
+    if (!el || reducedMotion.value) return
     gsap.fromTo(el,
       { scale: 0.5, rotation: -10 },
-      { scale: 1, rotation: 0, duration: 0.4, ease: 'back.out(2)' }
+      { scale: 1, rotation: 0, duration: 0.25, ease: 'back.out(2)' }
     )
   }
 

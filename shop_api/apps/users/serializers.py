@@ -7,10 +7,12 @@ from .models import User
 
 
 class RegisterSerializer(serializers.Serializer):
+    """用户注册序列化器。"""
     username = serializers.CharField(
         min_length=3,
         max_length=20,
         trim_whitespace=True,
+        help_text="用户名，3-20个字符，仅支持字母、数字和下划线",
         error_messages={
             "required": "请输入用户名",
             "blank": "用户名不能为空",
@@ -23,6 +25,7 @@ class RegisterSerializer(serializers.Serializer):
         max_length=20,
         trim_whitespace=False,
         write_only=True,
+        help_text="密码，6-20个字符，须包含字母和数字",
         error_messages={
             "required": "请输入密码",
             "blank": "密码不能为空",
@@ -35,6 +38,7 @@ class RegisterSerializer(serializers.Serializer):
         max_length=20,
         trim_whitespace=False,
         write_only=True,
+        help_text="确认密码，须与密码一致",
         error_messages={
             "required": "请再次输入密码",
             "blank": "确认密码不能为空",
@@ -71,8 +75,10 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.Serializer):
+    """用户登录序列化器。"""
     username = serializers.CharField(
         trim_whitespace=True,
+        help_text="用户名或邮箱",
         error_messages={
             "required": "请输入用户名",
             "blank": "用户名不能为空",
@@ -80,6 +86,7 @@ class LoginSerializer(serializers.Serializer):
     )
     password = serializers.CharField(
         trim_whitespace=False,
+        help_text="密码",
         error_messages={
             "required": "请输入密码",
             "blank": "密码不能为空",

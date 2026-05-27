@@ -151,9 +151,7 @@ async function handlePayConfirm() {
     } else {
       ElMessage.error('获取支付链接失败')
     }
-  } catch (err) {
-    ElMessage.error(err.message || '支付失败')
-  }
+  } catch {}
 }
 
 async function handleCancel() {
