@@ -109,3 +109,21 @@
   - `OrderCreateSerializer.create()` pops `quantity` from `item_data` before creating OrderItem — the quantity determines how many OrderItem rows are created (one per unit)
   - `OrderCancelView` only allows cancelling "pending" orders — paid/completed/cancelled orders return error
 ---
+
+## 2026-05-27 19:30 - US-006
+- What was implemented: Coupon module tests (41 tests)
+- Files changed:
+  - `shop_api/apps/marketing/tests.py` (rewritten) - 41 comprehensive tests across 5 test classes
+- Test coverage:
+  - TestCouponList (10 tests): active-only filter, inactive exclusion, not-yet-started exclusion, expired exclusion, unauthenticated access, response structure, value_yuan conversion (minus/discount/fixed), min_amount_yuan conversion
+  - TestCouponClaim (9 tests): success, increments used count, duplicate rejected, inactive rejected, not-yet-started rejected, expired rejected, fully claimed rejected, nonexistent rejected, missing coupon_id rejected
+  - TestMyCoupons (7 tests): empty list, list claimed, filter unused, filter used, user isolation, unauthenticated rejected, response structure
+  - TestAdminCoupon (8 tests): admin list, create, update, delete, non-admin cannot list/create, unauthenticated cannot access, admin detail
+  - TestCouponEdgeCases (7 tests): same coupon different users, used count reaches total, exactly at start/end time, unlimited total zero, claim response data
+- **Learnings for future iterations:**
+  - TestCouponList tests need explicit `db` fixture because `_coupon()` helper calls Coupon.objects.create() — api_client alone doesn't enable DB access
+  - Coupon with total=0 is considered "fully claimed" (0 >= 0 is True) — this is correct behavior, not a bug
+  - CouponClaimView wraps response in `success()` helper, so coupon data is at `resp.data["data"]` not `resp.data` directly
+  - Coupon model's unique constraint on `code` means test fixtures must use unique codes per test
+  - `CouponClaimSerializer.save()` increments coupon.used atomically — no race condition protection at serializer level
+---
