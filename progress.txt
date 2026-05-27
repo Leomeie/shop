@@ -371,3 +371,23 @@
   - `.gitignore` already excludes `.env` files but includes `.env.example` via `!.env.example`
   - WeChat Pay config is read from `settings.WECHAT_PAY` dict, not individual env vars — document as WECHAT_PAY_* prefix for future refactoring
 ---
+
+## 2026-05-27 24:15 - US-021
+- What was implemented: Pinia Store 持久化 — cartStore and userStore persist to localStorage
+- Files changed:
+  - `frontend/package.json` — added pinia-plugin-persistedstate dependency
+  - `frontend/src/main.js` — registered pinia-plugin-persistedstate on Pinia instance
+  - `frontend/src/stores/cart.js` — added `persist: { pick: ['items'] }` config
+  - `frontend/src/stores/user.js` — added `persist: { pick: ['userInfo'] }` config
+- Features:
+  - cartStore persists `items` array to localStorage (key: "cart")
+  - userStore persists `userInfo` to localStorage (key: "user")
+  - Tokens (`token`, `refreshTokenVal`) are excluded from plugin persistence — already manually handled by `setTokens()`/`logout()` via localStorage API
+  - On logout, `userInfo = null` is auto-persisted, clearing session state
+  - Browser verified: data survives page refresh, plugin correctly restores state
+- **Learnings for future iterations:**
+  - `pinia-plugin-persistedstate` only persists after store state changes from initial values — empty/default stores won't write to localStorage until modified
+  - User store already manually persisted tokens via `localStorage.setItem()` — using `pick: ['userInfo']` avoids duplication while keeping the existing token flow intact
+  - Plugin registers via `pinia.use()` BEFORE `app.use(pinia)` — order matters
+  - `persist.pick` is the cleanest way to exclude specific fields (like `loading`) from persistence
+---
