@@ -229,3 +229,20 @@
   - `_sign()` method sorts params alphabetically and skips empty values — same pattern as Alipay but with MD5 instead of RSA
   - Payment model METHOD_CHOICES must be updated when adding new backends — views.py get_backend() and model choices are separate registration points
 ---
+
+## 2026-05-27 22:15 - US-013
+- What was implemented: 商品搜索后端 (14 tests)
+- Files changed:
+  - `shop_api/apps/products/views.py` — added ProductSearchView with Q-object search across name, description, category
+  - `shop_api/apps/products/urls.py` — added /search/ route
+  - `shop_api/tests/test_product_search.py` (created) — 14 tests across 4 test classes
+- Test coverage:
+  - TestSearchBasic (5 tests): search by name, description, category name, multiple matches, case insensitive
+  - TestSearchFilters (5 tests): empty keyword, no q param, whitespace, inactive excluded, no match
+  - TestSearchPagination (2 tests): standard pagination structure, result fields
+  - TestSearchPermission (2 tests): unauthenticated access, partial keyword matching
+- **Learnings for future iterations:**
+  - DRF's `SearchFilter` on ProductListView only searches name and description — the new SearchView adds category name via Q-object OR query
+  - `Product.objects.none()` returns empty queryset for empty search keywords — cleaner than filtering with impossible condition
+  - `select_related("category")` on search queryset avoids N+1 queries when serializing category_name
+---
