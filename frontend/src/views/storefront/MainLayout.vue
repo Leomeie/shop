@@ -36,12 +36,14 @@
             <span>分类</span>
           </router-link>
 
-          <router-link to="/cart" class="nav-btn cart-btn">
-            <AnimatedIcons name="cart" :size="20" />
+          <div ref="cartBtnRef" class="nav-btn cart-btn-wrap">
+            <router-link to="/cart" class="cart-btn">
+              <AnimatedIcons name="cart" :size="20" />
+            </router-link>
             <Transition name="badge-pop">
-              <span v-if="cartStore.count" :key="cartStore.count" class="cart-badge">{{ cartStore.count }}</span>
+              <span v-if="cartStore.count" :key="cartStore.count" ref="cartBadgeRef" class="cart-badge">{{ cartStore.count }}</span>
             </Transition>
-          </router-link>
+          </div>
 
           <template v-if="userStore.isLoggedIn">
             <div class="user-menu" @mouseenter="menuOpen = true" @mouseleave="menuOpen = false">
@@ -142,12 +144,18 @@ import AnimatedIcons from '../../components/AnimatedIcons.vue'
 import GradientText from '../../components/GradientText.vue'
 import PageTransition from '../../components/PageTransition.vue'
 import { usePageTransition } from '../../composables/usePageTransition'
+import { useMicroInteraction } from '../../composables/useMicroInteraction'
 
 const router = useRouter()
 const route = useRoute()
 const { scrollToTop } = usePageTransition()
 const userStore = useUserStore()
 const cartStore = useCartStore()
+const { bounceBadge, pulseButton } = useMicroInteraction()
+
+const cartBtnRef = ref(null)
+const cartBadgeRef = ref(null)
+const prevCartCount = ref(0)
 
 const keyword = ref('')
 const menuOpen = ref(false)
@@ -159,6 +167,15 @@ const isHome = computed(() => route.name === 'Home')
 
 watch(() => route.fullPath, () => {
   nextTick(scrollToTop)
+})
+
+watch(() => cartStore.count, (newCount, oldCount) => {
+  if (newCount > oldCount) {
+    nextTick(() => {
+      bounceBadge(cartBadgeRef.value)
+      pulseButton(cartBtnRef.value)
+    })
+  }
 })
 
 const navClasses = computed(() => [
@@ -356,6 +373,18 @@ onUnmounted(() => {
   color: var(--text-primary);
 }
 
+.cart-btn-wrap {
+  position: relative;
+}
+
+.cart-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
 .cart-badge {
   position: absolute;
   top: 2px;
@@ -373,6 +402,7 @@ onUnmounted(() => {
   font-size: 11px;
   font-weight: 600;
   line-height: 1;
+  transform-origin: top right;
 }
 
 .login-btn {
@@ -523,11 +553,11 @@ onUnmounted(() => {
 }
 
 .badge-pop-enter-active {
-  animation: badgePop 0.35s var(--ease-spring);
+  animation: badgePop 0.25s var(--ease-spring);
 }
 
 .badge-pop-leave-active {
-  transition: opacity 0.2s ease-in;
+  transition: opacity 0.15s ease-in;
 }
 
 .badge-pop-leave-to {
@@ -677,6 +707,12 @@ onUnmounted(() => {
 @media (prefers-reduced-motion: reduce) {
   .scroll-progress {
     transition: none;
+  }
+
+  .badge-pop-enter-active,
+  .badge-pop-leave-active {
+    animation: none;
+    transition: opacity 0.15s ease-in;
   }
 }
 </style>
