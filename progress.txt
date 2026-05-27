@@ -73,6 +73,7 @@
 - `CartItem` has `unique_together = ("user", "sku")` — `CartService.add()` uses `get_or_create` to handle this
 - DRF throttle rates are class-level (`SimpleRateThrottle.THROTTLE_RATES`) evaluated at import time — `override_settings` doesn't affect them; patch the class attribute directly
 - Custom exception handler wraps all responses in `{"code", "message", "errors"}` — test 429/400/404 assertions must check `resp.data["message"]` not `resp.data["detail"]`
+- Frontend API errors: `request.js` interceptor shows ElMessage for 401/403/404/500/network; 400 validation errors are NOT shown (views handle field-level errors via `error.errors`)
 
 ## 2026-05-27 17:00 - US-004
 - What was implemented: Shopping cart module tests (49 tests)
@@ -390,4 +391,46 @@
   - User store already manually persisted tokens via `localStorage.setItem()` — using `pick: ['userInfo']` avoids duplication while keeping the existing token flow intact
   - Plugin registers via `pinia.use()` BEFORE `app.use(pinia)` — order matters
   - `persist.pick` is the cleanest way to exclude specific fields (like `loading`) from persistence
+---
+
+## 2026-05-27 24:30 - US-022
+- What was implemented: 路由过渡动画封装 — PageTransition wrapper component with reduced-motion support
+- Files changed:
+  - `frontend/src/components/PageTransition.vue` (created) — wrapper component encapsulating Transition + GSAP via usePageTransition
+  - `frontend/src/composables/usePageTransition.js` (updated) — added prefers-reduced-motion check, skips animation when enabled
+  - `frontend/src/views/storefront/MainLayout.vue` (updated) — replaced inline Transition with PageTransition component
+  - `frontend/src/views/admin/AdminLayout.vue` (updated) — added PageTransition wrapping router-view (was bare before)
+- Features:
+  - Fade-in + slight upward slide on enter (opacity 0→1, y 16→0, 350ms)
+  - Fade-out + slight upward slide on leave (opacity 1→0, y 0→-8, 180ms)
+  - `prefers-reduced-motion: reduce` skips all GSAP animations (calls `done()` immediately)
+  - `mode="out-in"` prevents overlapping page renders
+  - ScrollToTop composable still works independently via MainLayout watcher
+- **Learnings for future iterations:**
+  - `usePageTransition` composable depends on `useReducedMotion` from `useGsap.js` — it returns a `ref`, so access via `.value`
+  - AdminLayout had no page transitions before — wrapping with PageTransition gives admin panel consistent UX with storefront
+  - `PageTransition` component is stateless — it just delegates to the composable, making it easy to reuse anywhere
+  - `scrollToTop` remains in MainLayout (not in PageTransition) because it's a layout concern, not a transition concern
+---
+
+## 2026-05-27 17:01 - US-023
+- What was implemented: API 错误处理统一 — centralized error handling in request.js interceptor
+- Files changed:
+  - `frontend/src/utils/request.js` — added ElMessage import, centralized error display for 401/403/404/500/network errors
+  - `frontend/src/views/storefront/Checkout.vue` — simplified catch block (removed redundant ElMessage.error)
+  - `frontend/src/views/storefront/Downloads.vue` — simplified catch block
+  - `frontend/src/views/storefront/OrderDetail.vue` — simplified catch block
+  - `frontend/src/views/storefront/Profile.vue` — simplified catch block
+- Features:
+  - 401: shows "登录已过期，请重新登录" + redirects to login
+  - 403: shows "无权限访问"
+  - 404: shows "资源不存在"
+  - 500: shows "服务器繁忙，请稍后再试"
+  - Network error: shows "网络连接失败，请检查网络"
+  - 400 (validation) errors NOT shown by interceptor — views handle field-level errors via `error.errors`
+- **Learnings for future iterations:**
+  - `request.js` must import `ElMessage` from `element-plus` directly — can't rely on app-level registration for use in interceptors
+  - 400 validation errors should NOT be shown by the interceptor because views need to parse `error.errors` for field-level messages (e.g., Login/Register forms)
+  - Catch blocks that only did `ElMessage.error(error.message || 'fallback')` can be simplified to `catch {}` since the interceptor handles it
+  - Catch blocks with additional logic (redirects, state updates) should keep the catch but remove the error display
 ---
