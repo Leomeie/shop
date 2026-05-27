@@ -70,6 +70,8 @@
 - When testing user isolation, each test client needs its own `APIClient()` instance — sharing `api_client` across fixtures causes auth state collisions
 - Cart prices are in fen (cents); views divide by 100 for yuan display — test assertions must use matching math
 - `CartItem` has `unique_together = ("user", "sku")` — `CartService.add()` uses `get_or_create` to handle this
+- DRF throttle rates are class-level (`SimpleRateThrottle.THROTTLE_RATES`) evaluated at import time — `override_settings` doesn't affect them; patch the class attribute directly
+- Custom exception handler wraps all responses in `{"code", "message", "errors"}` — test 429/400/404 assertions must check `resp.data["message"]` not `resp.data["detail"]`
 
 ## 2026-05-27 17:00 - US-004
 - What was implemented: Shopping cart module tests (49 tests)
@@ -126,4 +128,23 @@
   - CouponClaimView wraps response in `success()` helper, so coupon data is at `resp.data["data"]` not `resp.data` directly
   - Coupon model's unique constraint on `code` means test fixtures must use unique codes per test
   - `CouponClaimSerializer.save()` increments coupon.used atomically — no race condition protection at serializer level
+---
+
+## 2026-05-27 20:00 - US-007
+- What was implemented: API rate limiting (throttling) — 12 comprehensive tests
+- Files changed:
+  - `shop_api/tests/test_throttling.py` (rewritten) — 12 tests across 5 test classes
+- Test coverage:
+  - TestAnonThrottle (3 tests): first request succeeds, throttled after limit, 429 response has message
+  - TestUserThrottle (3 tests): first request succeeds, throttled after limit, separate limits per user
+  - TestPaymentThrottle (2 tests): payment create throttled, payment callback throttled
+  - TestThrottleConfig (4 tests): anon rate=20/min, user rate=60/min, payment rate=10/min, throttle classes configured
+- Pre-existing implementation (already in codebase):
+  - `shop_api/config/settings/base.py`: DEFAULT_THROTTLE_CLASSES with AnonRateThrottle + UserRateThrottle, rates: anon=20/min, user=60/min, payment=10/min
+  - `shop_api/common/throttles.py`: PaymentRateThrottle custom throttle class
+  - Payment views use PaymentRateThrottle
+- **Learnings for future iterations:**
+  - DRF `SimpleRateThrottle.THROTTLE_RATES` is a class attribute evaluated at import time — `override_settings` does NOT change it. Must patch `SimpleRateThrottle.THROTTLE_RATES` directly in test fixtures to override throttle rates.
+  - Custom exception handler (`common/exceptions.py`) wraps all responses including 429 in `{"code": N, "message": "...", "errors": ...}` format — assertions must check `resp.data["message"]` not `resp.data["detail"]`.
+  - `cache.clear()` alone doesn't reset DRF throttle class-level rate caches — need to explicitly set `cls.rate = None` on each throttle class.
 ---
