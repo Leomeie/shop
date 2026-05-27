@@ -337,3 +337,26 @@
   - Frontend has no test script, so CI uses typecheck + build instead
   - `cache-dependency-path` must point to the right file for pip (requirements-dev.txt) and npm (package-lock.json)
 ---
+
+## 2026-05-27 23:50 - US-019
+- What was implemented: Docker development environment (docker-compose up one-click start)
+- Files changed:
+  - `shop_api/Dockerfile` (created) — Python 3.11-slim, MySQL client libs, dev dependencies
+  - `shop_api/docker-entrypoint.sh` (created) — runs migrations then starts dev server
+  - `frontend/Dockerfile` (created) — Node 20-slim, npm install, vite dev server
+  - `docker-compose.yml` (created) — db (MySQL 8.0) + backend + frontend orchestration
+  - `.env.docker` (created) — Docker-specific env vars (DB_HOST=db)
+  - `.dockerignore` (created) — excludes __pycache__, node_modules, .git, etc.
+  - `frontend/.dockerignore` (created) — excludes node_modules, dist
+  - `frontend/vite.config.js` (updated) — added `host: true` and `VITE_PROXY_TARGET` env var for Docker proxy
+- Usage: `docker-compose up` from project root
+  - Backend: http://localhost:8000 (Django with auto migrations)
+  - Frontend: http://localhost:5173 (Vite with HMR)
+  - MySQL: localhost:3306 (persistent volume)
+- **Learnings for future iterations:**
+  - Windows-created shell scripts need `sed -i 's/\r$//'` in Dockerfile to fix CRLF line endings
+  - Vite `host: true` is needed for Docker containers to accept external connections
+  - `VITE_PROXY_TARGET` env var lets Vite proxy to `backend:8000` in Docker while defaulting to `127.0.0.1:8000` locally
+  - MySQL healthcheck with `mysqladmin ping` + `depends_on: condition: service_healthy` ensures backend waits for DB
+  - Frontend volume uses anonymous volume `/app/node_modules` to prevent host node_modules from overriding container's
+---
