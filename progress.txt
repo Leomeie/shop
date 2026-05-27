@@ -91,3 +91,21 @@
   - Cart GET view silently skips inactive SKUs without cleaning them up — items referencing deactivated SKUs remain in DB but are invisible
   - `CartUpdateSerializer` has both fields optional — passing no valid fields is a no-op that still returns success
 ---
+
+## 2026-05-27 18:30 - US-005
+- What was implemented: Order flow integration tests (31 tests)
+- Files changed:
+  - `shop_api/apps/orders/tests.py` (rewritten) - 31 comprehensive tests across 5 test classes
+- Test coverage:
+  - TestOrderCreate (10 tests): selected cart → order, unique order numbers, item snapshots, cart cleared, remark, multiple SKUs, empty cart, no selected items, inactive SKU, unauthenticated
+  - TestPaymentFlow (9 tests): create mock payment, callback completes order, download count incremented, cannot pay already paid, cannot pay others' order, nonexistent order, payment query, missing payment_no, already processed callback
+  - TestOrderCancel (4 tests): cancel pending, cannot cancel paid, nonexistent order, others' order
+  - TestOrderListDetail (5 tests): list orders, filter by status, order detail, others' order 404, unauthenticated
+  - TestFullFlow (3 tests): full cart→order→payment→download chain, cart cleared after order, partial selection only orders selected items
+- **Learnings for future iterations:**
+  - SKU model has no stock/quantity field — digital products don't track inventory; the "库存不足" acceptance criteria from PRD doesn't apply to current implementation
+  - `PaymentCallbackView` uses `AllowAny` permission — no auth needed for mock callbacks, so test uses a fresh `APIClient()` without authentication
+  - `_complete_order()` in payment views marks order as "paid" then immediately "completed" in two save() calls — both status transitions happen atomically in one callback
+  - `OrderCreateSerializer.create()` pops `quantity` from `item_data` before creating OrderItem — the quantity determines how many OrderItem rows are created (one per unit)
+  - `OrderCancelView` only allows cancelling "pending" orders — paid/completed/cancelled orders return error
+---
