@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T09:29:49.789Z
-> Files: 270 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T09:41:21.079Z
+> Files: 271 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -13,7 +13,7 @@
 - `prd.json` (~3104 tok)
 - `PRD.md` — 产品需求文档 (PRD) (~4017 tok)
 - `Procfile` (~27 tok)
-- `progress.txt` — Ralph Progress Log (~8882 tok)
+- `progress.txt` — Ralph Progress Log (~9396 tok)
 - `README.md` — Project documentation (~6921 tok)
 - `render.yaml` (~213 tok)
 
@@ -46,7 +46,7 @@
 - `.env.example` — Frontend environment variables template (~220 tok)
 - `.gitignore` — Git ignore rules (~68 tok)
 - `Dockerfile` — Docker container definition (~38 tok)
-- `index.html` — ShopEase — AI 数字精品店 (~167 tok)
+- `index.html` — ShopEase — AI 数字精品店 (~241 tok)
 - `package-lock.json` — npm lock file (~17546 tok)
 - `package.json` — Node.js package manifest (~182 tok)
 - `README.md` — Project documentation (~97 tok)
@@ -102,6 +102,7 @@
 - `useScrollReveal.js` — Exports useScrollReveal (~336 tok)
 - `useStaggerGrid.js` — Exports useStaggerGrid (~294 tok)
 - `useTextReveal.js` — Exports useTextReveal (~394 tok)
+- `useTheme.js` — Exports useTheme (~361 tok)
 
 ## frontend/src/router/
 
@@ -116,7 +117,7 @@
 
 ## frontend/src/styles/
 
-- `global.css` — Styles: 51 rules, 81 vars, 1 media queries, 7 animations (~9490 tok)
+- `global.css` — Styles: 116 vars (~11786 tok)
 
 ## frontend/src/utils/
 
@@ -125,7 +126,7 @@
 
 ## frontend/src/views/admin/
 
-- `AdminLayout.vue` — Vue: setup (~2089 tok)
+- `AdminLayout.vue` — Vue: setup (~2317 tok)
 - `CouponManage.vue` — Vue: setup (~1799 tok)
 - `Dashboard.vue` — Vue: setup (~1571 tok)
 - `OrderManage.vue` — Vue: setup (~2228 tok)
@@ -142,7 +143,7 @@
 - `Help.vue` — Vue: setup (~1401 tok)
 - `Home.vue` — Vue: setup (~4466 tok)
 - `Login.vue` — Vue: setup (~3026 tok)
-- `MainLayout.vue` — Vue: setup (~4565 tok)
+- `MainLayout.vue` — Vue: setup (~4687 tok)
 - `OrderDetail.vue` — Vue: setup (~2212 tok)
 - `Orders.vue` — Vue: setup (~2064 tok)
 - `ProductDetail.vue` — Vue: setup (~3640 tok)
