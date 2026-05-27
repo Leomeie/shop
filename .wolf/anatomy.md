@@ -1,12 +1,12 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T09:41:21.079Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T11:12:10.878Z
 > Files: 271 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
 - `.dockerignore` (~36 tok)
-- `.gitignore` — Git ignore rules (~121 tok)
+- `.gitignore` — Git ignore rules (~139 tok)
 - `.mcp.json` (~126 tok)
 - `CLAUDE.md` — OpenWolf (~742 tok)
 - `docker-compose.yml` — Docker Compose services (~264 tok)
