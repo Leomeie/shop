@@ -198,3 +198,17 @@
   - Don't mock `connection.ensure_connection` globally when cache is database-backed — mock at the view module level (`config.views.connection`) instead to avoid breaking cache reads in the same request
   - Health check endpoint belongs in `config/views.py` (not any app) since it's cross-cutting infrastructure
 ---
+
+## 2026-05-27 21:30 - US-011
+- What was implemented: 登录失败锁定（暴力破解防护）
+- Files changed:
+  - `shop_api/apps/users/views.py` — added login lockout logic (5 failures → 15 min lockout)
+  - `shop_api/tests/test_login_lockout.py` (created) — 6 tests
+  - `shop_api/config/logging.py` — fixed ColorFormatter bug (`recordasctime` → `self.formatTime()`)
+- Test coverage:
+  - TestLoginLockout (6 tests): success login, lockout after 5 failures, 429 when locked, success resets counter, independent per-user lockout, friendly error message
+- **Learnings for future iterations:**
+  - `logging.Formatter` subclass must inherit from `logging.Formatter` to access `recordasctime` — custom formatters that don't inherit need to use `self.formatTime(record)` instead
+  - Login lockout uses cache keys `login_fail_{identifier}` and `login_lock_{identifier}` with TTL matching the lockout duration
+  - `LoginSerializer.validate()` calls `authenticate(username=...)` — tests must use the actual username field, not email
+---

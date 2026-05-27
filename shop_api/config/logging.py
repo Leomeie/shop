@@ -49,9 +49,10 @@ class ColorFormatter(logging.Formatter):
     def format(self, record):
         color = self.COLORS.get(record.levelname, "")
         reset = self.RESET
+        ts = self.formatTime(record, "%Y-%m-%d %H:%M:%S")
         return (
             f"{color}{record.levelname:<8}{reset} "
-            f"{recordasctime} "
+            f"{ts} "
             f"[{record.module}] "
             f"{record.getMessage()}"
         )
