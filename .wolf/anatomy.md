@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T08:21:50.808Z
-> Files: 263 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T09:09:05.583Z
+> Files: 270 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -10,10 +10,10 @@
 - `.mcp.json` (~126 tok)
 - `CLAUDE.md` — OpenWolf (~742 tok)
 - `docker-compose.yml` — Docker Compose services (~264 tok)
-- `prd.json` (~3106 tok)
+- `prd.json` (~3105 tok)
 - `PRD.md` — 产品需求文档 (PRD) (~4017 tok)
 - `Procfile` (~27 tok)
-- `progress.txt` — Ralph Progress Log (~6818 tok)
+- `progress.txt` — Ralph Progress Log (~8172 tok)
 - `README.md` — Project documentation (~6921 tok)
 - `render.yaml` (~213 tok)
 
@@ -63,7 +63,7 @@
 
 - `App.vue` — Vue component (~11 tok)
 - `env.d.ts` — / <reference types="vite/client" /> (~54 tok)
-- `main.js` — Declares app (~155 tok)
+- `main.js` — Declares app (~191 tok)
 
 ## frontend/src/api/
 
@@ -87,6 +87,7 @@
 
 - `AnimatedIcons.vue` — Vue: setup (~2483 tok)
 - `GradientText.vue` — Vue: setup (~282 tok)
+- `PageTransition.vue` — Vue: setup (~73 tok)
 - `ProductCard.vue` — Vue: setup (~1727 tok)
 - `StatusBadge.vue` — Vue: setup (~236 tok)
 - `StoreAccountNav.vue` — Vue: setup (~258 tok)
@@ -97,7 +98,7 @@
 
 - `useGsap.js` — Exports defaults, useReducedMotion, useIsMobile, useGsapDefaults (~493 tok)
 - `useMicroInteraction.js` — Exports useMicroInteraction (~365 tok)
-- `usePageTransition.js` — Exports usePageTransition (~208 tok)
+- `usePageTransition.js` — Exports usePageTransition (~262 tok)
 - `useScrollReveal.js` — Exports useScrollReveal (~336 tok)
 - `useStaggerGrid.js` — Exports useStaggerGrid (~294 tok)
 - `useTextReveal.js` — Exports useTextReveal (~394 tok)
@@ -109,9 +110,9 @@
 ## frontend/src/stores/
 
 - `app.js` — Exports useAppStore (~38 tok)
-- `cart.js` — Exports useCartStore (~404 tok)
+- `cart.js` — Exports useCartStore (~417 tok)
 - `types.ts` — Exports UserState, CartState, AppState (~90 tok)
-- `user.js` — Exports useUserStore (~423 tok)
+- `user.js` — Exports useUserStore (~437 tok)
 
 ## frontend/src/styles/
 
@@ -120,11 +121,11 @@
 ## frontend/src/utils/
 
 - `authFeedback.js` — Exports validateLoginForm, validateRegisterForm, parseAuthApiError (~1092 tok)
-- `request.js` — Declares request (~295 tok)
+- `request.js` — Declares request (~388 tok)
 
 ## frontend/src/views/admin/
 
-- `AdminLayout.vue` — Vue: setup (~2034 tok)
+- `AdminLayout.vue` — Vue: setup (~2089 tok)
 - `CouponManage.vue` — Vue: setup (~1799 tok)
 - `Dashboard.vue` — Vue: setup (~1571 tok)
 - `OrderManage.vue` — Vue: setup (~2228 tok)
@@ -136,17 +137,17 @@
 
 - `Cart.vue` — Vue: setup (~2521 tok)
 - `CategoryBrowse.vue` — Vue: setup (~1280 tok)
-- `Checkout.vue` — Vue: setup (~1776 tok)
-- `Downloads.vue` — Vue: setup (~1116 tok)
+- `Checkout.vue` — Vue: setup (~1760 tok)
+- `Downloads.vue` — Vue: setup (~1101 tok)
 - `Help.vue` — Vue: setup (~1401 tok)
 - `Home.vue` — Vue: setup (~4466 tok)
 - `Login.vue` — Vue: setup (~3026 tok)
-- `MainLayout.vue` — Vue: setup (~4345 tok)
-- `OrderDetail.vue` — Vue: setup (~2226 tok)
+- `MainLayout.vue` — Vue: setup (~4343 tok)
+- `OrderDetail.vue` — Vue: setup (~2212 tok)
 - `Orders.vue` — Vue: setup (~2064 tok)
 - `ProductDetail.vue` — Vue: setup (~3640 tok)
 - `ProductList.vue` — Vue: setup (~3223 tok)
-- `Profile.vue` — Vue: setup (~1212 tok)
+- `Profile.vue` — Vue: setup (~1204 tok)
 - `Register.vue` — Vue: setup (~2907 tok)
 - `Showcase.vue` — Vue: setup (~727 tok)
 - `Wishlist.vue` — Vue: setup (~782 tok)
@@ -406,3 +407,9 @@
 - `prd-frontend-experience.md` — PRD: 前端体验升级 (~712 tok)
 - `prd-security-ops.md` — PRD: 安全加固与运维基础设施 (~574 tok)
 - `prd-testing.md` — PRD: 测试覆盖体系建设 (~840 tok)
+- `test_persistence_final.py` — Declares app (~385 tok)
+- `test_persistence.py` (~617 tok)
+- `test_persistence2.py` (~729 tok)
+- `test_persistence3.py` — Declares app (~406 tok)
+- `test_persistence4.py` — Declares app (~658 tok)
+- `test_persistence5.py` — Declares app (~984 tok)

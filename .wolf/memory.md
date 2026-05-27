@@ -384,3 +384,77 @@
 | 24:02 | Updated README.md | env config section | done | ~1500 |
 | 24:03 | Updated .wolf/anatomy.md | frontend/.env.example | done | ~50 |
 | 16:21 | Edited prd.json | 14→14 lines | ~105 |
+| 16:24 | Session end: 2 writes across 2 files (README.md, prd.json) | 11 reads | ~20371 tok |
+
+## Session: 2026-05-27 16:24
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:25 | Edited frontend/src/main.js | 12→15 lines | ~158 |
+| 16:25 | Edited frontend/src/stores/cart.js | 2→6 lines | ~47 |
+| 16:25 | Edited frontend/src/stores/user.js | 2→6 lines | ~48 |
+| 16:30 | Created tasks/test_persistence.py | — | ~617 |
+| 16:32 | Created tasks/test_persistence2.py | — | ~729 |
+| 16:33 | Created tasks/test_persistence3.py | — | ~406 |
+| 16:34 | Created tasks/test_persistence4.py | — | ~658 |
+| 16:35 | Created tasks/test_persistence5.py | — | ~984 |
+| 16:36 | Created tasks/test_persistence_final.py | — | ~385 |
+| 16:38 | Edited prd.json | 14→14 lines | ~116 |
+| 16:39 | Edited progress.txt | expanded (+20 lines) | ~431 |
+
+## Session: 2026-05-27 24:15 (Ralph US-021)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 24:15 | Installed pinia-plugin-persistedstate | frontend/ | done | ~200 |
+| 24:16 | Edited frontend/src/main.js | registered plugin | done | ~158 |
+| 24:16 | Edited frontend/src/stores/cart.js | persist items | done | ~47 |
+| 24:16 | Edited frontend/src/stores/user.js | persist userInfo | done | ~48 |
+| 24:17 | Browser verified persistence | Playwright | both stores persist | ~0 |
+| 24:18 | Committed: feat: US-021 - Pinia Store 持久化 | 7 files | done | — |
+| 16:44 | Session end: 11 writes across 11 files (main.js, cart.js, user.js, test_persistence.py, test_persistence2.py) | 8 reads | ~15989 tok |
+
+## Session: 2026-05-27 16:44
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:45 | Created frontend/src/components/PageTransition.vue | — | ~73 |
+| 16:45 | Edited frontend/src/composables/usePageTransition.js | added 2 condition(s) | ~261 |
+| 16:45 | Edited frontend/src/views/storefront/MainLayout.vue | 7→7 lines | ~59 |
+| 16:46 | Edited frontend/src/views/storefront/MainLayout.vue | 3→3 lines | ~51 |
+| 16:46 | Edited frontend/src/views/storefront/MainLayout.vue | added 1 import(s) | ~63 |
+| 16:46 | Edited frontend/src/views/admin/AdminLayout.vue | CSS: component | ~56 |
+| 16:47 | Edited frontend/src/views/admin/AdminLayout.vue | added 1 import(s) | ~49 |
+| 16:49 | Edited prd.json | 16→16 lines | ~130 |
+| 16:49 | Edited progress.txt | expanded (+20 lines) | ~443 |
+| 17:00 | Created frontend/src/components/PageTransition.vue | Vue transition wrapper | ~70 |
+| 17:00 | Edited frontend/src/composables/usePageTransition.js | added reduced-motion support | ~200 |
+| 17:00 | Edited frontend/src/views/storefront/MainLayout.vue | replaced inline Transition with PageTransition | ~200 |
+| 17:00 | Edited frontend/src/views/admin/AdminLayout.vue | added PageTransition wrapping router-view | ~200 |
+| 17:00 | Edited prd.json | US-022 passes: false → true | ~130 |
+| 17:00 | Edited progress.txt | US-022 entry appended | ~443 |
+| 16:51 | Session end: 9 writes across 6 files (PageTransition.vue, usePageTransition.js, MainLayout.vue, AdminLayout.vue, prd.json) | 10 reads | ~20669 tok |
+
+## Session: 2026-05-27 16:52
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:56 | Edited frontend/src/utils/request.js | added 1 import(s) | ~41 |
+| 16:58 | Edited frontend/src/utils/request.js | added 3 condition(s) | ~172 |
+| 16:59 | Edited frontend/src/views/storefront/Checkout.vue | 3→1 lines | ~6 |
+| 16:59 | Edited frontend/src/views/storefront/OrderDetail.vue | removed 3 lines | ~4 |
+| 16:59 | Edited frontend/src/views/storefront/Downloads.vue | removed 3 lines | ~4 |
+| 16:59 | Edited frontend/src/views/storefront/Profile.vue | 3→1 lines | ~6 |
+
+## Session: 2026-05-27 17:01 (Ralph US-023)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 17:01 | Committed: feat: US-023 - API 错误处理统一 | 10 files | done | — |
+| 17:01 | Fixed prd.json (US-022/023 passes mismatch) | prd.json | US-023=true, US-022=true | ~130 |
+| 17:02 | Updated progress.txt with US-023 entry | progress.txt | appended | ~400 |
+| 17:06 | Edited prd.json | 14→14 lines | ~118 |
+| 17:06 | Edited prd.json | 13→13 lines | ~114 |
+| 17:07 | Edited prd.json | 13→13 lines | ~114 |
+| 17:08 | Edited progress.txt | expanded (+22 lines) | ~427 |
+| 17:09 | Edited progress.txt | 1→2 lines | ~95 |

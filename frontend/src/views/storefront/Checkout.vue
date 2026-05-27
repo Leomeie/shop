@@ -122,9 +122,7 @@ async function handleCreateOrder() {
     const res = await createOrder({ remark: remark.value })
     ElMessage.success('订单已创建')
     router.push(`/orders/${res.data.id}`)
-  } catch (error) {
-    ElMessage.error(error.message || '创建订单失败')
-  } finally {
+  } catch {} finally {
     loading.value = false
   }
 }
