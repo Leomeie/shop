@@ -256,7 +256,7 @@
         "所有测试通过"
       ],
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "notes": "prd-features-v2.md"
     },
     {

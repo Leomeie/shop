@@ -246,3 +246,20 @@
   - `Product.objects.none()` returns empty queryset for empty search keywords — cleaner than filtering with impossible condition
   - `select_related("category")` on search queryset avoids N+1 queries when serializing category_name
 ---
+
+## 2026-05-27 22:30 - US-016
+- What was implemented: 商品浏览量统计 — IP-based 24h dedup + admin ranking (10 tests)
+- Files changed:
+  - `shop_api/apps/products/views.py` — added cache-based IP deduplication to ProductDetailView
+  - `shop_api/apps/admin_panel/views.py` — added AdminProductViewCountView for ranking
+  - `shop_api/apps/admin_panel/urls.py` — added /products/views/ route
+  - `shop_api/tests/test_view_count.py` (created) — 10 tests across 2 test classes
+- Test coverage:
+  - TestViewCountDetail (5 tests): returns view_count, increments, same IP dedup, different IPs increment, cache key format
+  - TestAdminViewCountRanking (5 tests): admin access, non-admin denied, unauthenticated denied, ranking order, excludes deleted
+- **Learnings for future iterations:**
+  - Cache-based dedup (`cache.set(key, True, 86400)`) is simpler than DB tracking for IP-based 24h dedup
+  - `HTTP_X_FORWARDED_FOR` may contain comma-separated IPs — always split and take first
+  - Admin view count endpoint uses `APIView` + `values()` + `success()` instead of `ListAPIView` since `values()` returns dicts, not model instances
+  - `admin_user` fixture from conftest conflicts with migration-created "admin" superuser — test-local fixtures with unique usernames are required
+---

@@ -190,3 +190,16 @@ class AdminOrderDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return Order.objects.filter(is_deleted=False).select_related("user").prefetch_related("items")
+
+
+class AdminProductViewCountView(APIView):
+    """Top products by view count."""
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        products = (
+            Product.objects.filter(is_deleted=False)
+            .order_by("-view_count")
+            .values("id", "name", "view_count", "download_count", "status")[:20]
+        )
+        return success(list(products))
