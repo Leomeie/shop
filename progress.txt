@@ -1,0 +1,46 @@
+# Ralph Progress Log
+# Auto-appended by each iteration
+
+## Codebase Patterns
+- Backend uses Django REST Framework with JWT auth (simplejwt)
+- MySQL in dev, SQLite for tests
+- Custom User model (AbstractUser) with phone, nickname, avatar
+- Product has SKU model for pricing tiers (price in 分/cents)
+- Settings split: base.py / development.py / production.py
+- All apps live under shop_api/apps/
+- Common utilities in shop_api/common/ (pagination, permissions, response, exceptions)
+- Frontend: Vue 3 + Vite + Element Plus + Pinia
+
+## 2026-05-27 12:47 - US-001
+- What was implemented: Backend test infrastructure setup (pytest + DRF)
+- Files changed:
+  - `shop_api/requirements-dev.txt` (created) - test dependencies
+  - `shop_api/pyproject.toml` (created) - pytest configuration
+  - `shop_api/config/settings/test.py` (created) - SQLite test settings
+  - `shop_api/conftest.py` (created) - common fixtures (api_client, test_user, admin_user, auth_client, admin_client)
+  - `shop_api/apps/users/tests.py` (updated) - smoke tests
+- **Learnings for future iterations:**
+  - Test settings use SQLite in-memory and MD5PasswordHasher for speed
+  - InMemoryStorage avoids file system side effects in tests
+  - `force_authenticate()` is the cleanest way to test authenticated endpoints
+  - pytest-cov configured to cover `apps/` and `common/` directories
+---
+
+## 2026-05-27 14:30 - US-002
+- What was implemented: User module tests (register, login, JWT auth, guest access)
+- Files changed:
+  - `shop_api/conftest.py` (updated) - deferred get_user_model() into fixtures to fix AppRegistryNotReady
+  - `shop_api/apps/users/tests.py` (updated) - 24 comprehensive tests across 5 test classes
+- Test coverage:
+  - TestUserModel (2 tests): user creation, superuser creation
+  - TestRegister (11 tests): success, duplicate username, short password, no letter, no digit, missing fields, password mismatch, invalid username chars, pure digits
+  - TestLogin (4 tests): success, wrong password, nonexistent user, missing fields
+  - TestJWTAuth (4 tests): refresh success, invalid refresh, auth required, authenticated me
+  - TestGuestAccess (3 tests): browse products, cannot create order, cannot access cart
+- **Learnings for future iterations:**
+  - `conftest.py` must NOT call `get_user_model()` at module level — use local imports inside fixtures instead
+  - `UserView` (RetrieveUpdateAPIView) returns serialized data directly, not wrapped in `success()` — so `resp.data["username"]` not `resp.data["data"]["username"]`
+  - `admin_user` fixture in conftest creates username="admin" — use different usernames in test classes to avoid UNIQUE constraint conflicts
+  - pytest-django must be installed before pytest will recognize DJANGO_SETTINGS_MODULE from pyproject.toml
+  - rtk proxy supports inline Python with `python -c "..."` to run commands needing env vars
+---

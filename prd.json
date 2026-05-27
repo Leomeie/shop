@@ -1,0 +1,418 @@
+{
+  "project": "ShopEase",
+  "branchName": "ralph/upgrade-all",
+  "description": "ShopEase 全面升级：测试覆盖、功能补全、工程化、前端体验、安全运维",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "后端测试基础设施搭建",
+      "description": "搭建 pytest + DRF 测试基础设施，创建通用 fixtures（authenticated client、test user、test product）",
+      "acceptanceCriteria": [
+        "安装 pytest、pytest-django、pytest-factoryboy、pytest-cov",
+        "创建 shop_api/pytest.ini 或 pyproject.toml 配置 pytest",
+        "创建 conftest.py 提供通用 fixtures",
+        "pytest 命令可正常运行并输出覆盖率报告",
+        "至少有一个 smoke test 通过"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "prd-testing.md"
+    },
+    {
+      "id": "US-002",
+      "title": "用户模块测试",
+      "description": "测试注册、登录、JWT 认证流程",
+      "acceptanceCriteria": [
+        "注册：成功注册、重复邮箱、密码过短、缺少必填字段",
+        "登录：成功登录、错误密码、不存在的用户",
+        "JWT：access token 过期后用 refresh token 刷新、无效 token 拒绝",
+        "游客可以浏览商品，未登录不能下单",
+        "所有测试通过"
+      ],
+      "priority": 1,
+      "passes": true,
+      "dependsOn": ["US-001"],
+      "notes": "prd-testing.md"
+    },
+    {
+      "id": "US-003",
+      "title": "商品模块测试",
+      "description": "测试商品 CRUD、分类、SKU 管理",
+      "acceptanceCriteria": [
+        "商品列表分页、按分类筛选",
+        "商品详情返回正确数据结构",
+        "管理员可以创建/编辑/上下架商品",
+        "非管理员不能执行管理操作",
+        "SKU 价格和库存正确",
+        "所有测试通过"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-001"],
+      "notes": "prd-testing.md"
+    },
+    {
+      "id": "US-004",
+      "title": "购物车模块测试",
+      "description": "测试购物车的完整操作",
+      "acceptanceCriteria": [
+        "添加商品到购物车（同 SKU 不重复添加，增加数量）",
+        "修改购物车商品数量",
+        "删除购物车商品",
+        "全选/取消全选",
+        "未登录不能操作购物车",
+        "库存不足时给出明确错误",
+        "所有测试通过"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-001"],
+      "notes": "prd-testing.md"
+    },
+    {
+      "id": "US-005",
+      "title": "订单流程集成测试",
+      "description": "测试从购物车到下单到支付的完整流程",
+      "acceptanceCriteria": [
+        "从购物车创建订单（正确扣减库存、生成订单号）",
+        "创建支付（Mock 模式）并完成支付",
+        "支付完成后订单状态正确变更",
+        "库存不足时下单失败并回滚",
+        "所有测试通过"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-004"],
+      "notes": "prd-testing.md"
+    },
+    {
+      "id": "US-006",
+      "title": "优惠券模块测试",
+      "description": "测试优惠券领取、使用、过期逻辑",
+      "acceptanceCriteria": [
+        "领取优惠券（未过期、未领完）",
+        "不能重复领取已领的优惠券",
+        "下单时使用优惠券（满减/折扣/固定金额）",
+        "过期优惠券不能使用",
+        "已使用的优惠券不能重复使用",
+        "所有测试通过"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-001"],
+      "notes": "prd-testing.md"
+    },
+    {
+      "id": "US-007",
+      "title": "API 限流",
+      "description": "限制 API 请求频率，防止恶意刷接口",
+      "acceptanceCriteria": [
+        "在 REST_FRAMEWORK 配置中添加 DEFAULT_THROTTLE_CLASSES",
+        "未认证用户：20 次/分钟",
+        "已认证用户：60 次/分钟",
+        "支付相关接口：10 次/分钟",
+        "限流返回 429 状态码和友好提示",
+        "所有测试通过"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "prd-security-ops.md"
+    },
+    {
+      "id": "US-008",
+      "title": "API 文档自动生成",
+      "description": "使用 drf-spectacular 自动生成 OpenAPI 3.0 文档",
+      "acceptanceCriteria": [
+        "安装 drf-spectacular",
+        "配置 DEFAULT_SCHEMA_CLASS",
+        "API 文档页面可通过 /api/docs/ 访问",
+        "Schema JSON 可通过 /api/schema/ 获取",
+        "所有序列化器有 description 和 help_text"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "prd-security-ops.md"
+    },
+    {
+      "id": "US-009",
+      "title": "结构化日志",
+      "description": "建立结构化日志体系，便于排查问题",
+      "acceptanceCriteria": [
+        "创建 shop_api/config/logging.py 配置日志格式",
+        "日志格式包含：时间戳、级别、模块名、消息",
+        "生产环境输出 JSON 格式日志",
+        "开发环境输出彩色可读日志",
+        "支付回调必须记录完整请求/响应"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "prd-security-ops.md"
+    },
+    {
+      "id": "US-010",
+      "title": "健康检查端点",
+      "description": "创建 /api/health/ 端点用于监控和负载均衡",
+      "acceptanceCriteria": [
+        "创建 /api/health/ 端点",
+        "检查数据库连接",
+        "检查缓存连接",
+        "返回状态：{ status: ok/error, db: ok/error, cache: ok/error }",
+        "健康时返回 200，异常时返回 503",
+        "不需要认证"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "prd-security-ops.md"
+    },
+    {
+      "id": "US-011",
+      "title": "登录失败锁定",
+      "description": "限制登录失败次数，防止暴力破解",
+      "acceptanceCriteria": [
+        "同一邮箱连续 5 次登录失败后锁定 15 分钟",
+        "锁定期间返回'账号已锁定，请稍后再试'",
+        "成功登录重置失败计数",
+        "锁定信息存储在缓存中",
+        "所有测试通过"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "prd-security-ops.md"
+    },
+    {
+      "id": "US-012",
+      "title": "微信支付后端",
+      "description": "实现微信支付后端，保持与支付宝一致的策略模式",
+      "acceptanceCriteria": [
+        "创建 WechatPaymentBackend，继承 PaymentBackend ABC",
+        "实现 create_payment() 返回微信支付链接",
+        "实现 verify_notification() 验证回调签名",
+        "使用策略模式，与 AlipayPaymentBackend 一致",
+        "支持沙箱/测试模式",
+        "所有测试通过"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "prd-features-v2.md"
+    },
+    {
+      "id": "US-013",
+      "title": "商品搜索 - 后端",
+      "description": "实现商品关键词搜索 API",
+      "acceptanceCriteria": [
+        "创建 SearchView，支持 GET /api/v1/products/search/?q=keyword",
+        "搜索范围：商品名称、描述、分类名称",
+        "支持分页（使用 StandardPagination）",
+        "搜索结果按相关性排序",
+        "空关键词返回空结果",
+        "所有测试通过"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "prd-features-v2.md"
+    },
+    {
+      "id": "US-014",
+      "title": "商品搜索 - 前端",
+      "description": "在商品列表页添加搜索框",
+      "acceptanceCriteria": [
+        "商品列表页顶部添加搜索输入框",
+        "输入防抖（300ms）",
+        "搜索结果高亮关键词",
+        "无结果时显示友好提示",
+        "搜索状态通过 URL params 保持",
+        "Verify in browser"
+      ],
+      "priority": 3,
+      "passes": false,
+      "dependsOn": ["US-013"],
+      "notes": "prd-features-v2.md"
+    },
+    {
+      "id": "US-015",
+      "title": "评价系统增强",
+      "description": "评价支持评分和图片",
+      "acceptanceCriteria": [
+        "Review 模型添加 rating 字段（1-5 星）",
+        "Review 模型添加 images 字段（JSONField，最多 5 张）",
+        "商品详情页显示平均评分和评分分布",
+        "只能评价已购买且已支付的商品",
+        "同一订单项只能评价一次",
+        "所有测试通过"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "prd-features-v2.md"
+    },
+    {
+      "id": "US-016",
+      "title": "商品浏览量统计",
+      "description": "自动统计商品浏览量",
+      "acceptanceCriteria": [
+        "Product 模型添加 view_count 字段",
+        "商品详情 API 返回 view_count",
+        "每次访问自动 +1（同一用户/IP 24h 去重）",
+        "Admin Dashboard 显示浏览量排行",
+        "所有测试通过"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "prd-features-v2.md"
+    },
+    {
+      "id": "US-017",
+      "title": "前端 TypeScript 渐进迁移 - API 层",
+      "description": "为 API 层和 Store 层添加类型定义",
+      "acceptanceCriteria": [
+        "安装 TypeScript、@types/node",
+        "创建 tsconfig.json，allowJs: true",
+        "为 src/api/*.js 创建 .d.ts 类型定义",
+        "为 src/stores/*.js 创建类型定义",
+        "vue-tsc --noEmit 无类型错误"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "prd-engineering.md"
+    },
+    {
+      "id": "US-018",
+      "title": "GitHub Actions CI 管道",
+      "description": "每次 push 和 PR 自动运行测试和 lint",
+      "acceptanceCriteria": [
+        "创建 .github/workflows/ci.yml",
+        "后端 jobs：安装依赖 → pytest → 覆盖率报告",
+        "前端 jobs：npm ci → npm run test → npm run build",
+        "在 PR 上自动运行"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "prd-engineering.md"
+    },
+    {
+      "id": "US-019",
+      "title": "Docker 开发环境",
+      "description": "用 docker-compose up 一键启动完整开发环境",
+      "acceptanceCriteria": [
+        "创建 Dockerfile (后端 Django)",
+        "创建 frontend/Dockerfile (前端 Vite)",
+        "创建 docker-compose.yml 编排：db + backend + frontend",
+        "docker-compose up 后后端在 :8000，前端在 :5173",
+        "热重载正常工作"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "prd-engineering.md"
+    },
+    {
+      "id": "US-020",
+      "title": "环境变量规范化",
+      "description": "创建 .env.example 并规范化环境变量管理",
+      "acceptanceCriteria": [
+        "创建 .env.example 列出所有环境变量及说明",
+        ".env 已在 .gitignore 中",
+        "Django settings 统一从环境变量读取敏感配置",
+        "README 中有环境配置说明"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "prd-engineering.md"
+    },
+    {
+      "id": "US-021",
+      "title": "Pinia Store 持久化",
+      "description": "刷新页面后购物车和登录状态不丢失",
+      "acceptanceCriteria": [
+        "安装 pinia-plugin-persistedstate",
+        "cartStore 持久化到 localStorage",
+        "userStore 持久化到 localStorage",
+        "刷新页面后购物车商品仍在",
+        "刷新页面后登录状态保持",
+        "登出时清除 userStore 持久化数据",
+        "Verify in browser"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "prd-frontend-experience.md"
+    },
+    {
+      "id": "US-022",
+      "title": "路由过渡动画封装",
+      "description": "创建 PageTransition 组件实现页面切换动画",
+      "acceptanceCriteria": [
+        "创建 PageTransition 包裹组件",
+        "使用 Vue Transition + GSAP 实现页面切换动画",
+        "支持淡入淡出 + 轻微位移效果",
+        "router-view 被 PageTransition 包裹",
+        "用户偏好 reduced-motion 时禁用动画",
+        "Verify in browser"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "prd-frontend-experience.md"
+    },
+    {
+      "id": "US-023",
+      "title": "API 错误处理统一",
+      "description": "request.js 拦截器统一处理错误响应，显示中文友好提示",
+      "acceptanceCriteria": [
+        "request.js 拦截器统一处理错误响应",
+        "401 错误自动跳转登录页",
+        "403 显示'无权限'，404 显示'资源不存在'",
+        "500 显示'服务器繁忙'，网络错误显示'网络连接失败'",
+        "使用 ElMessage 显示错误",
+        "所有 API 调用不需要单独处理通用错误",
+        "Verify in browser"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "prd-frontend-experience.md"
+    },
+    {
+      "id": "US-024",
+      "title": "购物车数量脉冲动画",
+      "description": "添加商品到购物车时有视觉反馈",
+      "acceptanceCriteria": [
+        "添加商品时购物车图标有脉冲/弹跳动画",
+        "购物车数量 badge 变化时有数字滚动效果",
+        "动画持续时间 < 300ms",
+        "使用已有的 useMicroInteraction composable",
+        "Verify in browser"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "prd-frontend-experience.md"
+    },
+    {
+      "id": "US-025",
+      "title": "商品卡片骨架屏",
+      "description": "商品列表加载时显示骨架屏",
+      "acceptanceCriteria": [
+        "商品列表加载时显示骨架屏",
+        "骨架屏动画为微光效果（shimmer）",
+        "数据加载完成后平滑过渡到真实内容",
+        "使用 Element Plus 的 el-skeleton 组件",
+        "Verify in browser"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "prd-frontend-experience.md"
+    },
+    {
+      "id": "US-026",
+      "title": "暗色模式基础支持",
+      "description": "支持亮/暗两套主题切换",
+      "acceptanceCriteria": [
+        "使用 CSS 变量支持主题切换",
+        "添加暗色模式 CSS 变量集",
+        "在 Header 添加主题切换按钮",
+        "主题偏好持久化到 localStorage",
+        "跟随系统偏好",
+        "所有页面在暗色模式下可读",
+        "Verify in browser"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "prd-frontend-experience.md"
+    }
+  ]
+}
