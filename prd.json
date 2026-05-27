@@ -285,7 +285,7 @@
         "在 PR 上自动运行"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": "prd-engineering.md"
     },
     {

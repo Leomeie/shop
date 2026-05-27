@@ -322,3 +322,18 @@
   - `clearFilters()` already preserves the search term — designed that way from the start
   - Route query watcher syncs `searchInput` ref when URL changes externally (e.g., back/forward navigation)
 ---
+
+## 2026-05-27 23:45 - US-018
+- What was implemented: GitHub Actions CI pipeline (backend + frontend)
+- Files changed:
+  - `.github/workflows/ci.yml` (created) — CI workflow with backend and frontend jobs
+- Features:
+  - Triggers on push to master and ralph/* branches, and on PRs to master
+  - Backend job: Python 3.12, pip cache, install dev deps, pytest with coverage XML
+  - Frontend job: Node.js 20, npm ci, typecheck (vue-tsc), build (vite)
+  - Coverage artifact uploaded (7-day retention)
+- **Learnings for future iterations:**
+  - Test settings use SQLite + InMemoryStorage — no MySQL needed in CI
+  - Frontend has no test script, so CI uses typecheck + build instead
+  - `cache-dependency-path` must point to the right file for pip (requirements-dev.txt) and npm (package-lock.json)
+---
