@@ -300,7 +300,7 @@
         "热重载正常工作"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": "prd-engineering.md"
     },
     {

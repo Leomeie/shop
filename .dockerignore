@@ -1,0 +1,15 @@
+__pycache__
+*.pyc
+*.pyo
+.venv
+venv
+node_modules
+frontend/node_modules
+frontend/dist
+.git
+.claude
+.wolf
+*.log
+.env
+.env.*
+!.env.example
