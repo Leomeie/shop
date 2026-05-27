@@ -83,6 +83,17 @@
               </div>
 
               <div class="results-toolbar__right">
+                <div class="search-input-wrap">
+                  <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <input
+                    v-model="searchInput"
+                    type="text"
+                    class="search-input"
+                    placeholder="搜索商品…"
+                    @input="onSearchInput"
+                  />
+                  <button v-if="searchInput" class="search-clear" type="button" @click="clearSearch">×</button>
+                </div>
                 <button v-if="route.query.search || route.query.category || route.query.is_featured" class="result-chip" type="button" @click="clearFilters">
                   清空筛选
                 </button>
@@ -106,7 +117,7 @@
 
             <div v-else-if="products.length" class="product-grid">
               <div v-for="(product, index) in products" :key="product.id" class="grid-item" :style="{ '--i': index }">
-                <ProductCard :product="product" />
+                <ProductCard :product="product" :keyword="route.query.search" />
               </div>
             </div>
 
@@ -155,6 +166,8 @@ const total = ref(0)
 const page = ref(1)
 const pageSize = 20
 const ordering = ref('-created_at')
+const searchInput = ref(route.query.search || '')
+let searchTimer = null
 
 const sortOptions = [
   { label: '最新上架', value: '-created_at' },
@@ -195,6 +208,18 @@ function setOrdering(value) {
   ordering.value = value
   page.value = 1
   fetchData()
+}
+
+function onSearchInput() {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    updateQuery({ search: searchInput.value || undefined })
+  }, 300)
+}
+
+function clearSearch() {
+  searchInput.value = ''
+  updateQuery({ search: undefined })
 }
 
 async function fetchData() {
@@ -255,11 +280,15 @@ watch(() => products.value, () => {
   nextTick(animateGrid)
 }, { flush: 'post' })
 
-onUnmounted(() => gridCtx?.revert())
+onUnmounted(() => {
+  clearTimeout(searchTimer)
+  gridCtx?.revert()
+})
 
 watch(
   () => route.query,
-  () => {
+  (q) => {
+    searchInput.value = q.search || ''
     page.value = 1
     fetchData()
   },
@@ -344,6 +373,63 @@ watch(
   display: flex;
   justify-content: center;
   padding-top: var(--sp-6);
+}
+
+.search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 200px;
+  padding: 6px 30px 6px 32px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-full);
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  font-size: var(--text-xs);
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color var(--dur-fast), width var(--dur-normal);
+}
+
+.search-input:focus {
+  border-color: var(--accent);
+  width: 260px;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-clear {
+  position: absolute;
+  right: 6px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.search-clear:hover {
+  color: var(--text-primary);
+}
+
+.results-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
 }
 
 @media (max-width: 1200px) {
