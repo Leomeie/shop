@@ -44,3 +44,24 @@
   - pytest-django must be installed before pytest will recognize DJANGO_SETTINGS_MODULE from pyproject.toml
   - rtk proxy supports inline Python with `python -c "..."` to run commands needing env vars
 ---
+
+## 2026-05-27 16:00 - US-003
+- What was implemented: Product module tests (CRUD, categories, SKU, permissions, pricing)
+- Files changed:
+  - `shop_api/apps/products/tests.py` (rewritten) - 54 comprehensive tests across 8 test classes
+- Test coverage:
+  - TestProductList (10 tests): empty list, active-only filter, deleted exclusion, pagination, category filter, featured filter, search by name/description, ordering, response structure
+  - TestProductDetail (8 tests): 200 OK, 404 for deleted/draft, detail structure, SKU yuan conversion, min price, view count increment, images in response
+  - TestAdminProductCRUD (10 tests): admin list, list excludes deleted, create, update, status change, soft delete, batch activate/deactivate/delete, invalid batch action
+  - TestNonAdminPermission (6 tests): 403 for list/create/update/delete/batch, 401 for unauthenticated
+  - TestAdminSKU (6 tests): list/create/update/delete SKUs, yuan fields, non-admin denied
+  - TestAdminCategory (5 tests): list/create/update/delete categories, non-admin denied
+  - TestCategoryEndpoints (4 tests): tree structure, inactive exclusion, flat list, flat inactive exclusion
+  - TestSKUPricing (5 tests): min price active/inactive/none, price filter min/max
+- **Learnings for future iterations:**
+  - Migration `0003_create_superuser` creates a "admin" superuser — test fixtures must use unique usernames (e.g., `prod_admin`) to avoid UNIQUE constraint conflicts
+  - Django's ImageField validates file content — test images must use Pillow to create valid JPEG, not raw bytes
+  - Admin SKU list endpoint uses DRF's default pagination — access via `resp.data["results"]` not `resp.data` directly
+  - Category endpoints have `pagination_class = None` so `resp.data` is a flat list, but `0002_seed_categories` migration seeds 12 categories — tests must filter by name instead of counting total
+  - `AdminProductBatchView` returns `success(message="参数错误", code=400)` for invalid actions — status is 400, not 200
+---
