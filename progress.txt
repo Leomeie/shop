@@ -212,3 +212,20 @@
   - Login lockout uses cache keys `login_fail_{identifier}` and `login_lock_{identifier}` with TTL matching the lockout duration
   - `LoginSerializer.validate()` calls `authenticate(username=...)` — tests must use the actual username field, not email
 ---
+
+## 2026-05-27 22:00 - US-012
+- What was implemented: 微信支付后端 (13 tests)
+- Files changed:
+  - `shop_api/apps/payment/backends/wechat.py` (created) — WechatPaymentBackend implementing PaymentBackend ABC
+  - `shop_api/apps/payment/views.py` — registered wechat backend in get_backend()
+  - `shop_api/apps/payment/models.py` — added "wechat" to METHOD_CHOICES
+  - `shop_api/tests/test_wechat_payment.py` (created) — 13 tests across 3 test classes
+- Test coverage:
+  - TestWechatSandbox (6 tests): create_payment pending, pay_url format, query_payment success, verify_notification auto-succeeds, fail result handling, refund not_supported
+  - TestWechatProduction (4 tests): create_payment builds params, query_payment pending, valid signature verification, bad signature rejection
+  - TestWechatSign (3 tests): deterministic signing, empty value skipping, uppercase hex output
+- **Learnings for future iterations:**
+  - WeChat sandbox mode auto-succeeds verification — useful for integration tests without real API calls
+  - `_sign()` method sorts params alphabetically and skips empty values — same pattern as Alipay but with MD5 instead of RSA
+  - Payment model METHOD_CHOICES must be updated when adding new backends — views.py get_backend() and model choices are separate registration points
+---

@@ -7,9 +7,11 @@ from rest_framework.views import APIView
 from .models import Payment
 from .backends.mock import MockPaymentBackend
 from .backends.alipay import AlipayPaymentBackend
+from .backends.wechat import WechatPaymentBackend
 from apps.orders.models import Order
 from common.utils import generate_payment_no
 from common.response import success, error
+from common.throttles import PaymentRateThrottle
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +22,8 @@ def get_backend(method="mock"):
     if method not in _backend_instances:
         if method == "alipay":
             _backend_instances[method] = AlipayPaymentBackend()
+        elif method == "wechat":
+            _backend_instances[method] = WechatPaymentBackend()
         else:
             _backend_instances[method] = MockPaymentBackend()
     return _backend_instances[method]
@@ -51,6 +55,7 @@ def _complete_order(payment):
 class PaymentCreateView(APIView):
     """Create a payment for an order."""
     permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [PaymentRateThrottle]
 
     def post(self, request):
         order_id = request.data.get("order_id")
@@ -89,6 +94,7 @@ class PaymentCreateView(APIView):
 class PaymentCallbackView(APIView):
     """Mock payment callback — simulates successful payment."""
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [PaymentRateThrottle]
 
     def post(self, request):
         payment_no = request.data.get("payment_no")
@@ -156,6 +162,7 @@ class AlipayNotifyView(APIView):
 class PaymentQueryView(APIView):
     """Query payment status."""
     permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [PaymentRateThrottle]
 
     def get(self, request, payment_no):
         payment = Payment.objects.filter(

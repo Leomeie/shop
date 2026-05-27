@@ -7,6 +7,7 @@ class Payment(models.Model):
     METHOD_CHOICES = [
         ("mock", "模拟支付"),
         ("alipay", "支付宝"),
+        ("wechat", "微信支付"),
         ("stripe", "Stripe"),
     ]
     STATUS_CHOICES = [
