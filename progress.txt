@@ -183,3 +183,18 @@
   - `IS_PRODUCTION` detection via `DJANGO_SETTINGS_MODULE` suffix works well for switching log formats
   - Payment logger (`apps.payment`) needs `propagate: False` to avoid duplicate entries in root handler
 ---
+
+## 2026-05-27 21:15 - US-010
+- What was implemented: 健康检查端点 /api/health/
+- Files changed:
+  - `shop_api/config/views.py` (created) — HealthCheckView with db + cache checks
+  - `shop_api/config/urls.py` — added /api/health/ route
+  - `shop_api/tests/test_health.py` (created) — 5 tests
+- Test coverage:
+  - HealthCheckView checks db connection and cache r/w, returns { status, db, cache }
+  - 200 when healthy, 503 when any check fails
+  - No authentication required (AllowAny + no auth classes)
+- **Learnings for future iterations:**
+  - Don't mock `connection.ensure_connection` globally when cache is database-backed — mock at the view module level (`config.views.connection`) instead to avoid breaking cache reads in the same request
+  - Health check endpoint belongs in `config/views.py` (not any app) since it's cross-cutting infrastructure
+---
