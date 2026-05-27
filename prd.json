@@ -271,7 +271,7 @@
         "vue-tsc --noEmit 无类型错误"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": "prd-engineering.md"
     },
     {

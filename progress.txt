@@ -10,6 +10,7 @@
 - All apps live under shop_api/apps/
 - Common utilities in shop_api/common/ (pagination, permissions, response, exceptions)
 - Frontend: Vue 3 + Vite + Element Plus + Pinia
+- Frontend TypeScript: use .d.ts files alongside .js modules for gradual migration; `moduleResolution: "bundler"` in tsconfig.json
 
 ## 2026-05-27 12:47 - US-001
 - What was implemented: Backend test infrastructure setup (pytest + DRF)
@@ -278,4 +279,27 @@
   - Review model already had `rating` field and `unique_together` constraint — US-015 only needed the `images` addition
   - `JSONField(default=list)` is the correct way to store variable-length lists in Django — no need for a separate image model for simple cases
   - `serializers.ListField(child=serializers.URLField(), max_length=5)` provides both list validation and URL format validation
+---
+
+## 2026-05-27 23:00 - US-017
+- What was implemented: 前端 TypeScript 渐进迁移 — API 层和 Store 层类型定义
+- Files changed:
+  - `frontend/tsconfig.json` (created) — TypeScript config with allowJs: true, strict mode
+  - `frontend/src/env.d.ts` (created) — Vite env and .vue module declarations
+  - `frontend/src/api/types.ts` (created) — Shared API response types (ApiResponse, PaginatedResponse)
+  - `frontend/src/api/user.d.ts` (created) — User/auth API type definitions
+  - `frontend/src/api/product.d.ts` (created) — Product/category/SKU API type definitions
+  - `frontend/src/api/cart.d.ts` (created) — Cart API type definitions
+  - `frontend/src/api/order.d.ts` (created) — Order API type definitions
+  - `frontend/src/api/payment.d.ts` (created) — Payment API type definitions
+  - `frontend/src/api/adminProduct.d.ts` (created) — Admin product API type definitions
+  - `frontend/src/api/adminPanel.d.ts` (created) — Admin panel API type definitions
+  - `frontend/src/stores/types.ts` (created) — Store state type definitions
+  - `frontend/package.json` (updated) — added typecheck script, TypeScript devDependencies
+- Verification: `vue-tsc --noEmit` passes, `vite build` succeeds
+- **Learnings for future iterations:**
+  - TypeScript 6 deprecates `baseUrl` — use `moduleResolution: "bundler"` instead for Vite projects
+  - API response interceptor wraps all responses in `{ code, message, data }` — types reflect this via `ApiResponse<T>`
+  - `.d.ts` files provide types for existing `.js` modules without converting them — ideal for gradual migration
+  - Frontend uses relative imports (not `@/` aliases), so no `paths` config needed
 ---
