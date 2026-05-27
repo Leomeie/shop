@@ -360,3 +360,14 @@
   - MySQL healthcheck with `mysqladmin ping` + `depends_on: condition: service_healthy` ensures backend waits for DB
   - Frontend volume uses anonymous volume `/app/node_modules` to prevent host node_modules from overriding container's
 ---
+## 2026-05-27 24:00 - US-020
+- What was implemented: 环境变量规范化 — comprehensive .env.example files + README docs
+- Files changed:
+  - `shop_api/.env.example` (rewritten) — all backend env vars with descriptions
+  - `frontend/.env.example` (created) — frontend VITE env vars
+  - `README.md` — added 环境配置 section with quick start guide and env var tables
+- **Learnings for future iterations:**
+  - Django settings already use `os.environ.get()` for all sensitive config — no code changes needed
+  - `.gitignore` already excludes `.env` files but includes `.env.example` via `!.env.example`
+  - WeChat Pay config is read from `settings.WECHAT_PAY` dict, not individual env vars — document as WECHAT_PAY_* prefix for future refactoring
+---
