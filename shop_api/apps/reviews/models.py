@@ -9,6 +9,7 @@ class Review(models.Model):
     order = models.ForeignKey("orders.Order", on_delete=models.SET_NULL, null=True, blank=True, verbose_name="订单")
     rating = models.PositiveSmallIntegerField("评分", choices=[(i, str(i)) for i in range(1, 6)])
     content = models.TextField("评价内容", blank=True)
+    images = models.JSONField("评价图片", default=list, blank=True)
     is_anonymous = models.BooleanField("匿名评价", default=False)
     created_at = models.DateTimeField("创建时间", auto_now_add=True)
 

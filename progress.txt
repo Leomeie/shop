@@ -263,3 +263,19 @@
   - Admin view count endpoint uses `APIView` + `values()` + `success()` instead of `ListAPIView` since `values()` returns dicts, not model instances
   - `admin_user` fixture from conftest conflicts with migration-created "admin" superuser — test-local fixtures with unique usernames are required
 ---
+
+## 2026-05-27 22:45 - US-015
+- What was implemented: 评价系统增强 — images JSONField (8 tests)
+- Files changed:
+  - `shop_api/apps/reviews/models.py` — added `images` JSONField (default=list)
+  - `shop_api/apps/reviews/serializers.py` — added images to ReviewSerializer and ReviewCreateSerializer (max 5 URLs)
+  - `shop_api/apps/reviews/migrations/0002_review_images.py` (created) — migration for images field
+  - `shop_api/tests/test_review_images.py` (created) — 8 tests across 2 test classes
+- Test coverage:
+  - TestReviewImages (6 tests): create with images, create without images, max 5 limit, URL validation, list includes images, JSON storage
+  - TestReviewStats (2 tests): stats with reviews, stats empty
+- **Learnings for future iterations:**
+  - Review model already had `rating` field and `unique_together` constraint — US-015 only needed the `images` addition
+  - `JSONField(default=list)` is the correct way to store variable-length lists in Django — no need for a separate image model for simple cases
+  - `serializers.ListField(child=serializers.URLField(), max_length=5)` provides both list validation and URL format validation
+---

@@ -8,7 +8,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ["id", "product", "order", "rating", "content",
+        fields = ["id", "product", "order", "rating", "content", "images",
                   "is_anonymous", "username", "created_at"]
         read_only_fields = ["id", "created_at"]
 
@@ -23,6 +23,9 @@ class ReviewCreateSerializer(serializers.Serializer):
     order_id = serializers.IntegerField(required=False)
     rating = serializers.IntegerField(min_value=1, max_value=5)
     content = serializers.CharField(max_length=1000, required=False, default="")
+    images = serializers.ListField(
+        child=serializers.URLField(), max_length=5, required=False, default=list,
+    )
     is_anonymous = serializers.BooleanField(default=False)
 
     def validate(self, data):
@@ -47,5 +50,6 @@ class ReviewCreateSerializer(serializers.Serializer):
             order_id=self.validated_data.get("order_id"),
             rating=self.validated_data["rating"],
             content=self.validated_data.get("content", ""),
+            images=self.validated_data.get("images", []),
             is_anonymous=self.validated_data.get("is_anonymous", False),
         )
