@@ -130,7 +130,7 @@
         "所有序列化器有 description 和 help_text"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": "prd-security-ops.md"
     },
     {
@@ -145,7 +145,7 @@
         "支付回调必须记录完整请求/响应"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": "prd-security-ops.md"
     },
     {
