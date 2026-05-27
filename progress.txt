@@ -65,3 +65,29 @@
   - Category endpoints have `pagination_class = None` so `resp.data` is a flat list, but `0002_seed_categories` migration seeds 12 categories — tests must filter by name instead of counting total
   - `AdminProductBatchView` returns `success(message="参数错误", code=400)` for invalid actions — status is 400, not 200
 ---
+
+## Codebase Patterns (cont.)
+- When testing user isolation, each test client needs its own `APIClient()` instance — sharing `api_client` across fixtures causes auth state collisions
+- Cart prices are in fen (cents); views divide by 100 for yuan display — test assertions must use matching math
+- `CartItem` has `unique_together = ("user", "sku")` — `CartService.add()` uses `get_or_create` to handle this
+
+## 2026-05-27 17:00 - US-004
+- What was implemented: Shopping cart module tests (49 tests)
+- Files changed:
+  - `shop_api/apps/cart/tests.py` (rewritten) - 49 comprehensive tests across 9 test classes
+- Test coverage:
+  - TestCartAuth (7 tests): all endpoints require authentication
+  - TestCartAdd (11 tests): single item, quantity increment, accumulation, multiple SKUs, inactive SKU, nonexistent SKU, missing fields, quantity validation, default selected
+  - TestCartGet (8 tests): empty cart, items with yuan conversion, total calculation, selected_total, original_price, inactive SKU hiding, user isolation, response structure
+  - TestCartUpdate (7 tests): quantity, selected, both fields, nonexistent item, quantity validation (zero/max), subtotal recalculation
+  - TestCartDelete (3 tests): single item, nonexistent idempotent, partial delete
+  - TestCartClear (2 tests): full clear, empty clear
+  - TestCartSelectAll (3 tests): toggle select/deselect, default true, deselect clears selected_total
+  - TestCartRemoveSelected (4 tests): bulk remove, empty list fails, nonexistent IDs succeed, missing field fails
+  - TestCartEdgeCases (4 tests): yuan conversion precision, quantity*price math, partial update preserves other fields
+- **Learnings for future iterations:**
+  - Each `APIClient()` instance must be independent when testing user isolation — sharing the `api_client` fixture and calling `force_authenticate()` on it overwrites auth for all users sharing that instance
+  - `CartService.add()` increments quantity (does not set) — calling add(sku_id, 2) twice gives quantity=4, not 2
+  - Cart GET view silently skips inactive SKUs without cleaning them up — items referencing deactivated SKUs remain in DB but are invisible
+  - `CartUpdateSerializer` has both fields optional — passing no valid fields is a no-op that still returns success
+---
