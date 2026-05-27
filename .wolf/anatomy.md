@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T09:09:05.583Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T09:20:38.577Z
 > Files: 270 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -13,7 +13,7 @@
 - `prd.json` (~3105 tok)
 - `PRD.md` — 产品需求文档 (PRD) (~4017 tok)
 - `Procfile` (~27 tok)
-- `progress.txt` — Ralph Progress Log (~8172 tok)
+- `progress.txt` — Ralph Progress Log (~8509 tok)
 - `README.md` — Project documentation (~6921 tok)
 - `render.yaml` (~213 tok)
 
@@ -97,7 +97,7 @@
 ## frontend/src/composables/
 
 - `useGsap.js` — Exports defaults, useReducedMotion, useIsMobile, useGsapDefaults (~493 tok)
-- `useMicroInteraction.js` — Exports useMicroInteraction (~365 tok)
+- `useMicroInteraction.js` — Exports useMicroInteraction (~405 tok)
 - `usePageTransition.js` — Exports usePageTransition (~262 tok)
 - `useScrollReveal.js` — Exports useScrollReveal (~336 tok)
 - `useStaggerGrid.js` — Exports useStaggerGrid (~294 tok)
@@ -142,7 +142,7 @@
 - `Help.vue` — Vue: setup (~1401 tok)
 - `Home.vue` — Vue: setup (~4466 tok)
 - `Login.vue` — Vue: setup (~3026 tok)
-- `MainLayout.vue` — Vue: setup (~4343 tok)
+- `MainLayout.vue` — Vue: setup (~4565 tok)
 - `OrderDetail.vue` — Vue: setup (~2212 tok)
 - `Orders.vue` — Vue: setup (~2064 tok)
 - `ProductDetail.vue` — Vue: setup (~3640 tok)

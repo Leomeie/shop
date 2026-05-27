@@ -434,3 +434,20 @@
   - Catch blocks that only did `ElMessage.error(error.message || 'fallback')` can be simplified to `catch {}` since the interceptor handles it
   - Catch blocks with additional logic (redirects, state updates) should keep the catch but remove the error display
 ---
+
+## 2026-05-27 17:30 - US-024
+- What was implemented: 购物车数量脉冲动画 — cart icon pulse + badge bounce on add
+- Files changed:
+  - `frontend/src/composables/useMicroInteraction.js` — added `useReducedMotion` import/guard, reduced `bounceBadge` duration from 400ms to 250ms
+  - `frontend/src/views/storefront/MainLayout.vue` — restructured cart button with div wrapper for ref access, added `useMicroInteraction` import, added `watch(cartStore.count)` to trigger bounce + pulse on count increase, added `.cart-btn-wrap` and `.cart-btn` CSS, added `prefers-reduced-motion` suppression for badge animation
+- Features:
+  - Cart icon pulses (scale 1→0.95→1, 200ms) when item is added
+  - Badge bounces in (scale 0.5→1 with rotation, 250ms, `back.out(2)` easing)
+  - Badge-pop CSS transition reduced from 350ms to 250ms
+  - `prefers-reduced-motion: reduce` disables all cart animations
+  - All animations < 300ms
+- **Learnings for future iterations:**
+  - `useReducedMotion` is a singleton ref shared across all callers — registering listeners in composable is safe as long as it's called once per component
+  - Template ref on `router-link` gives component instance, not DOM element — use a wrapper div for direct DOM ref access
+  - `watch(cartStore.count, (new, old) => ...)` naturally receives old/new values, no need for separate `prevCount` tracking
+---
