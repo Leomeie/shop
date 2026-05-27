@@ -303,3 +303,22 @@
   - `.d.ts` files provide types for existing `.js` modules without converting them — ideal for gradual migration
   - Frontend uses relative imports (not `@/` aliases), so no `paths` config needed
 ---
+
+## 2026-05-27 23:30 - US-014
+- What was implemented: 商品搜索前端 — search input with debounce + keyword highlighting
+- Files changed:
+  - `frontend/src/views/storefront/ProductList.vue` — added search input with 300ms debounce, clear button, URL sync
+  - `frontend/src/components/ProductCard.vue` — added keyword prop and `highlightText()` for search result highlighting
+- Features:
+  - Search input in results toolbar with magnifying glass icon and clear button
+  - 300ms debounce before updating URL query params
+  - Keyword highlighting in product name and category via `<mark>` tags
+  - Search state preserved in URL (survives navigation, shareable)
+  - "清空筛选" clears category/featured but preserves search
+  - Input expands on focus (200px → 260px) for visual polish
+- **Learnings for future iterations:**
+  - `v-html` with `highlightText()` is the simplest way to add keyword highlighting without a dedicated component
+  - Must escape regex special chars in search keyword to prevent injection in `new RegExp()`
+  - `clearFilters()` already preserves the search term — designed that way from the start
+  - Route query watcher syncs `searchInput` ref when URL changes externally (e.g., back/forward navigation)
+---
