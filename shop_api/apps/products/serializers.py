@@ -3,6 +3,7 @@ from .models import Category, Product, ProductImage, SKU
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """商品分类序列化器（含子分类树）。"""
     children = serializers.SerializerMethodField()
 
     class Meta:
@@ -23,6 +24,7 @@ class CategoryTreeSerializer(serializers.ModelSerializer):
 
 
 class SKUSerializer(serializers.ModelSerializer):
+    """SKU（库存单位）序列化器，价格以元为单位。"""
     price_yuan = serializers.SerializerMethodField()
     original_price_yuan = serializers.SerializerMethodField()
 
